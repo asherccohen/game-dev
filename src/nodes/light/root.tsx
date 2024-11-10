@@ -18,18 +18,16 @@ function SceneLighting({ debug = false }: { debug?: boolean }) {
   return (
     <>
       <ambientLight intensity={0.5} />
-      {/* <pointLight position={[10, 10, 10]} /> */}
-      {/* <directionalLight position={[0, 1, 0]} intensity={0.5} /> */}
       <pointLight
         ref={pointLightRef}
-        position={[5, 5, 5]}
+        position={[10, 10, 10]}
         intensity={10}
         color="white"
       />
       <directionalLight
         ref={directionalLightRef}
         position={[10, 10, 10]}
-        intensity={3}
+        intensity={0.5}
       />
     </>
   );

@@ -1,9 +1,10 @@
-import { CameraControlsProps } from '@react-three/drei';
+import {
+  CameraControlsProps,
+  PerspectiveCamera as PrimitivePerspectiveCamera,
+} from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { RefObject, useEffect, useRef } from 'react';
-import { Mesh, Vector3 } from 'three';
-
-import { PerspectiveCamera as OriginalPerspectiveCamera } from '@react-three/drei';
+import { Mesh, Texture, Vector3 } from 'three';
 
 interface CameraSetupProps {
   position?: [number, number, number];
@@ -111,4 +112,18 @@ export function IsometricCameraSetup() {
   return null;
 }
 
-export const PerspectiveCamera = OriginalPerspectiveCamera;
+type PerspectiveCameraProps = Omit<
+  JSX.IntrinsicElements['perspectiveCamera'],
+  'children'
+> & {
+  makeDefault?: boolean;
+  manual?: boolean;
+  children?: React.ReactNode | ((texture: Texture) => React.ReactNode);
+  frames?: number;
+  resolution?: number;
+  envMap?: Texture;
+};
+
+export function PerspectiveCamera(props: PerspectiveCameraProps) {
+  return <PrimitivePerspectiveCamera {...props} />;
+}

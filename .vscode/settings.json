@@ -1,0 +1,19 @@
+{
+  "cSpell.words": [],
+  "cSpell.language": "en, it, de",
+  "editor.codeActionsOnSave": {
+    "source.removeUnusedImports": "explicit",
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+  "emmet.showSuggestionsAsSnippets": true,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "git.autofetch": true,
+  "diffEditor.ignoreTrimWhitespace": true,
+  "editor.minimap.enabled": false,
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  }
+}

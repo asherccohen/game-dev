@@ -25,7 +25,7 @@ const GameScene: React.FC = () => {
         <Physics>
           <Character position={[5, 0, 5]} moveSpeed={5} />
           <Barbarian position={[-5, 0, -5]} moveSpeed={5} />
-          <Ground />
+          <Ground debug />
         </Physics>
 
         <Sky />

@@ -1,5 +1,6 @@
 import { fixupConfigRules } from '@eslint/compat';
 import js from '@eslint/js';
+import reactCompilerPlugin from 'eslint-plugin-react-compiler';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactJsx from 'eslint-plugin-react/configs/jsx-runtime.js';
 import react from 'eslint-plugin-react/configs/recommended.js';
@@ -22,9 +23,11 @@ export default [
   {
     plugins: {
       'react-hooks': reactHooks,
+      'react-compiler': reactCompilerPlugin,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      'react-compiler/react-compiler': 'error',
     },
   },
   { ignores: ['dist/'] },
