@@ -1,6 +1,6 @@
 import './App.css';
 
-import React, { PropsWithChildren, Suspense } from 'react';
+import React, { PropsWithChildren, Suspense, useState } from 'react';
 import GameScene from './game-scene';
 
 import { Html, useProgress } from '@react-three/drei';
@@ -44,6 +44,7 @@ function Loader() {
 }
 
 const App: React.FC = () => {
+  const [debugMode, setDebugMode] = useState<boolean>(false);
   return (
     <div
       style={{
@@ -55,6 +56,14 @@ const App: React.FC = () => {
         overflow: 'hidden',
       }}
     >
+      <form>
+        <label htmlFor="debug">Debug Mode:</label>
+        <input
+          type="checkbox"
+          id="debug"
+          onChange={() => setDebugMode(!debugMode)}
+        />
+      </form>
       <ErrorBoundary
         FallbackComponent={ErrorFallback}
         onReset={(details) => {
@@ -62,7 +71,7 @@ const App: React.FC = () => {
         }}
       >
         <Suspense fallback={<Loader />}>
-          <GameScene />
+          <GameScene debug={debugMode} />
         </Suspense>
       </ErrorBoundary>
     </div>

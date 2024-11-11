@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
 import React, { Suspense } from 'react';
 
+import { PerfDebug } from './libs/performance';
 import CustomCamera from './nodes/camera/root';
 import Character from './nodes/character/root';
 import CustomControls from './nodes/controls/root';
@@ -16,16 +17,16 @@ function Loader() {
   return <Html center>{progress} % loaded</Html>;
 }
 
-const GameScene: React.FC = () => {
+const GameScene: React.FC<{ debug?: boolean }> = ({ debug = false }) => {
   return (
     <Canvas>
       <Suspense fallback={<Loader />}>
-        <SceneLighting debug />
+        <SceneLighting debug={debug} />
 
         <Physics>
           <Character position={[5, 0, 5]} moveSpeed={5} />
           <Barbarian position={[-5, 0, -5]} moveSpeed={5} />
-          <Ground debug />
+          <Ground debug={debug} />
         </Physics>
 
         <Sky />
@@ -35,10 +36,14 @@ const GameScene: React.FC = () => {
           fov={35}
           near={0.1}
           far={1000}
-          debug
+          debug={debug}
         />
-        <CustomControls debug />
+        <CustomControls debug={debug} />
       </Suspense>
+
+      {debug ? (
+        <PerfDebug position="top-right" minimal={false} showGraph={true} />
+      ) : null}
     </Canvas>
   );
 };
