@@ -1,11 +1,12 @@
-import { Html, useProgress } from '@react-three/drei';
+import { Html, KeyboardControls, useProgress } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
 import React, { Suspense } from 'react';
 
-import { PerfDebug } from './libs/performance';
+import { StatsDebug } from './libs/performance';
 import CustomCamera from './nodes/camera/root';
 import Character from './nodes/character/root';
+import { keyboardMap } from './nodes/character/use-character-controls';
 import CustomControls from './nodes/controls/root';
 import Barbarian from './nodes/enemy/root';
 import Ground from './nodes/ground/root';
@@ -23,11 +24,16 @@ const GameScene: React.FC<{ debug?: boolean }> = ({ debug = false }) => {
       <Suspense fallback={<Loader />}>
         <SceneLighting debug={debug} />
 
-        <Physics>
-          <Character position={[5, 0, 5]} moveSpeed={5} />
+        <Physics debug={debug}>
+          <KeyboardControls map={keyboardMap}>
+            <Character position={[5, 0, 5]} moveSpeed={5} />
+          </KeyboardControls>
           <Barbarian position={[-5, 0, -5]} moveSpeed={5} />
           <Ground debug={debug} />
         </Physics>
+
+        {/* Add environment to the scene */}
+        {/* <Environment preset="studio" background /> */}
 
         <Sky />
 
@@ -42,7 +48,10 @@ const GameScene: React.FC<{ debug?: boolean }> = ({ debug = false }) => {
       </Suspense>
 
       {debug ? (
-        <PerfDebug position="top-right" minimal={false} showGraph={true} />
+        <>
+          {/* <PerfDebug  /> */}
+          <StatsDebug />
+        </>
       ) : null}
     </Canvas>
   );
