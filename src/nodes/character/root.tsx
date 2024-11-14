@@ -10,8 +10,59 @@ import React, { Suspense, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Mesh, Vector3 } from 'three';
 import { characterMachine } from './character-machine';
+import { keyboardMap, useCharacterControls } from './use-character-controls';
 import { useCharacterLoader } from './use-character-loader';
-import { useCharacterControls } from './use-character-controls';
+
+const MOVEMENT_CONFIG = {
+  moveSpeed: 5,
+  accelerationFactor: 0.1,
+  maxVelocity: 10,
+  friction: 0.9,
+};
+
+/**
+ * Interpolation Mechanics
+Alpha value ranges from 0 to 1
+0: No movement (stay at current position)
+1: Instant jump to target position
+0.1: Slow, smooth movement (recommended)
+ */
+function improvedMovementLogic(
+  body: RapierRigidBody,
+  moveVector: Vector3,
+  delta: number,
+) {
+  const desiredVelocity = new Vector3(
+    moveVector.x,
+    0,
+    moveVector.z,
+  ).multiplyScalar(MOVEMENT_CONFIG.moveSpeed);
+
+  const currentVelocity = body.linvel();
+
+  const smoothedVelocity = new Vector3().lerpVectors(
+    currentVelocity,
+    desiredVelocity,
+    delta * MOVEMENT_CONFIG.accelerationFactor,
+  );
+
+  const impulse = smoothedVelocity.clone().multiplyScalar(body.mass());
+  body.applyImpulse(impulse, true);
+}
+
+function applyCustomFriction(body: RapierRigidBody, moveVector: Vector3) {
+  const frictionFactor = 0.9; // Adjust based on surface
+
+  const currentVelocity = body.linvel();
+
+  const friction = new Vector3(
+    moveVector.x * currentVelocity.x,
+    0,
+    moveVector.z * currentVelocity.z,
+  ).multiplyScalar(frictionFactor);
+
+  body.setLinvel(friction, true);
+}
 
 interface CharacterProps extends RigidBodyProps {
   moveSpeed?: number;
@@ -30,8 +81,6 @@ const CharacterPrimitive: React.FC<CharacterProps> = ({
   const characterRef = useRef<Mesh>(null!);
   const rigidBodyRef = useRef<RapierRigidBody>(null!);
 
-  // Machine with provided implementations
-  // Will keep provided implementations up-to-date
   const [snapshot, send] = useMachine(
     characterMachine.provide({
       actions: {
@@ -42,26 +91,8 @@ const CharacterPrimitive: React.FC<CharacterProps> = ({
     }),
   );
 
-  // const handleMovement = () => {
-  //   const body = rigidBodyRef.current;
-  //   if (!body) return;
-
-  //   // Example movement logic (placeholder)
-  //   const impulse: Vector3 = new Vector3(
-  //     moveSpeed * Math.random(),
-  //     0,
-  //     moveSpeed * Math.random(),
-  //   );
-  //   body.applyImpulse(impulse, true);
-  // };
-
-  // Typed attack method
-  // const handleAttack = () => {
-  //   console.log('Character attacks!');
-  //   // Implement attack logic
-  // };
-
   useCharacterControls({
+    keyboardMap,
     onMoveForward: () => {
       send({ type: 'character.walk', direction: 'up' });
     },
@@ -80,12 +111,21 @@ const CharacterPrimitive: React.FC<CharacterProps> = ({
     onSprint: () => {
       send({ type: 'character.sprint' });
     },
+    onKeyUp: () => {
+      send({ type: 'character.stop' });
+    },
   });
 
   console.log('🚀 ~ snapshot.value:', snapshot.value);
   console.log('🚀 ~ snapshot.context:', snapshot.context);
   // Frame-based updates
-  useFrame((state, delta: number) => {
+  /*
+   * delta is a common variable in game development
+   * that represents the time elapsed since the last frame.
+   * It's usually calculated by the game engine or the rendering loop.
+   */
+
+  useFrame((state, delta) => {
     // Potential frame-based logic
     //  if (meshRef.current) {
     //    meshRef.current.rotation.x += delta;
@@ -98,77 +138,114 @@ const CharacterPrimitive: React.FC<CharacterProps> = ({
     const body = rigidBodyRef.current;
     if (!body) return;
 
-    // const { velocity } = snapshot.context;
-    // console.log('🚀 ~ useFrame ~ velocity:', velocity);
-
-    // const impulse: Vector3 = new Vector3(velocity.x, 0, velocity.z);
-
-    // body.applyImpulse(impulse, true);
-
-    // Smoothly interpolate movement
-    // const smoothedMovement = Vector3.lerp(
-    //   currentPosition,
-    //   targetPosition,
-    //   deltaTime * SMOOTHING_FACTOR,
-    // );
-
-    // Calculate movement vector
     // const moveVector = new Vector3();
-    // const SPEED = 5;
-
-    // if (forwardPressed) {
-    //   moveVector.z -= SPEED;
-    // }
-    // if (backPressed) {
-    //   moveVector.z += SPEED;
-    // }
-    // if (leftPressed) {
-    //   moveVector.x -= SPEED;
-    // }
-    // if (rightPressed) {
-    //   moveVector.x += SPEED;
-    // }
-
-    // Apply movement using physics engine
-    // rigidBodyRef.current.applyImpulse(moveVector.multiplyScalar(0.1), true);
-
-    const moveVector = new Vector3();
 
     switch (snapshot.value) {
       case 'idle':
-        // moveVector.z = snapshot.context.velocity.z;
+        {
+          const moveVector = new Vector3(0, 0, 0);
+          // Reset velocity when not grounded or not moving
+          body.setLinvel(moveVector, true);
+        }
+
         break;
       case 'walking':
         switch (snapshot.context.direction) {
           case 'up':
-            moveVector.z -= snapshot.context.velocity.z;
+            {
+              const moveVector = new Vector3(0, 0, snapshot.context.velocity.z);
+              // moveVector.z -= snapshot.context.velocity.z;
+              // moveVector.z = snapshot.context.velocity.z;
+              improvedMovementLogic(body, moveVector, delta);
+
+              // Reduce velocity if no input
+              // if (moveVector.length() === 0) {
+              //   applyCustomFriction(body, moveVector);
+              // }
+            }
             break;
           case 'down':
-            moveVector.z += snapshot.context.velocity.z;
+            {
+              const moveVector = new Vector3(0, 0, snapshot.context.velocity.z);
+              // moveVector.z += snapshot.context.velocity.z;
+              // moveVector.z = snapshot.context.velocity.z;
+              improvedMovementLogic(body, moveVector, delta);
+
+              // Reduce velocity if no input
+              // if (moveVector.length() === 0) {
+              //   applyCustomFriction(body, moveVector);
+              // }
+            }
+
             break;
           case 'left':
-            moveVector.x -= snapshot.context.velocity.x;
+            {
+              const moveVector = new Vector3(snapshot.context.velocity.x, 0, 0);
+              // moveVector.x -= snapshot.context.velocity.x;
+              // moveVector.x = snapshot.context.velocity.x;
+              improvedMovementLogic(body, moveVector, delta);
+
+              // Reduce velocity if no input
+              // if (moveVector.length() === 0) {
+              //   applyCustomFriction(body, moveVector);
+              // }
+            }
             break;
           case 'right':
-            moveVector.x += snapshot.context.velocity.x;
+            {
+              const moveVector = new Vector3(snapshot.context.velocity.x, 0, 0);
+              // moveVector.x += snapshot.context.velocity.x;
+              // moveVector.x = snapshot.context.velocity.x;
+              improvedMovementLogic(body, moveVector, delta);
+
+              // Reduce velocity if no input
+              // if (moveVector.length() === 0) {
+              //   applyCustomFriction(body, moveVector);
+              // }
+            }
             break;
           default:
             break;
         }
         break;
       case 'sprinting':
-        // Handle sprinting state
-        moveVector.x -= snapshot.context.velocity.x * 2;
+        // moveVector.x -= snapshot.context.velocity.x * 2;
+        improvedMovementLogic(
+          body,
+          new Vector3(snapshot.context.velocity.x * 2, 0, 0),
+          delta,
+        );
+
+        // Reduce velocity if no input
+        // if (moveVector.length() === 0) {
+        //   applyCustomFriction(body, moveVector);
+        // }
         break;
-      // case 'jumping':
-      //   // Handle jumping state
-      //   break;
+      case 'jumping':
+        // Handle jumping state
+        break;
       default:
         break;
     }
 
-    // Apply movement using physics engine
-    rigidBodyRef.current.applyImpulse(moveVector, true);
+    /**
+     * To avoid the character flying off the screen because the velocity
+     * is being applied continuously when a key is held down,
+     * causing the character to accelerate rapidly.
+     * We're checking if the character is grounded and
+     * if the move vector has a length greater than 0
+     * before applying the velocity.
+     * If the character is not grounded or the move vector is zero,
+     * we're resetting the velocity to zero.
+     */
+    // if (snapshot.matches('walking') && moveVector.length() > 0) {
+    //   improvedMovementLogic(body, moveVector, delta);
+    // }
+
+    // // Reduce velocity if no input
+    // if (snapshot.matches('walking') && moveVector.length() === 0) {
+    //   applyCustomFriction(body, moveVector);
+    // }
   });
 
   return (

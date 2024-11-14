@@ -26,6 +26,8 @@ interface ControlsProps {
   onMoveRight: () => void;
   onJump: () => void;
   onSprint: () => void;
+  onKeyUp: () => void;
+  keyboardMap?: typeof keyboardMap;
 }
 
 export const useCharacterControls = ({
@@ -35,6 +37,8 @@ export const useCharacterControls = ({
   onMoveRight,
   onJump,
   onSprint,
+  onKeyUp,
+  keyboardMap,
 }: ControlsProps) => {
   const forwardPressed = useKeyboardControls<Controls>(
     (state) => state.forward,
@@ -64,6 +68,23 @@ export const useCharacterControls = ({
     if (sprintPressed) {
       onSprint();
     }
+
+    /**
+     * When a key is released, check if it is in the keyboardMap,
+     * if so, call onKeyUp
+     * @param e Keyboard event
+     */
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (!!keyboardMap?.filter((item) => item.keys.includes(e.key))) {
+        onKeyUp();
+      }
+    };
+
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keyup', handleKeyUp);
+    };
   }, [forwardPressed, backPressed, leftPressed, rightPressed]);
 };
 
