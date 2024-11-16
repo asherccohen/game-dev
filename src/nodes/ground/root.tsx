@@ -1,13 +1,20 @@
 import { RigidBody } from '@react-three/rapier';
-import { GroundDebug } from '../../libs/ground';
+import { Euler, Vector3 } from 'three';
 
-const Ground = ({ debug = false }: { debug: boolean }) => (
+const Ground = ({
+  position = new Vector3(0, 0, 0),
+  rotation = new Euler(-Math.PI / 2, 0, 0),
+  scale = 1,
+}: {
+  position?: Vector3;
+  rotation?: Euler;
+  scale?: number;
+}) => (
   <RigidBody type="fixed">
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+    <mesh rotation={rotation} position={position} scale={scale}>
       <planeGeometry args={[20, 20]} />
       <meshStandardMaterial color="green" />
     </mesh>
-    {debug ? <GroundDebug /> : null}
   </RigidBody>
 );
 

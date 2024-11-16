@@ -1,14 +1,16 @@
 import { OrbitControls, OrbitControlsProps } from '@react-three/drei';
 
 const CustomControls = ({
-  debug = false,
+  enablePan = true,
+  enableRotate = true,
+  enableZoom = true,
   ...props
-}: OrbitControlsProps & { debug?: boolean }) => {
+}: OrbitControlsProps) => {
   return (
     <OrbitControls
-      enablePan={true}
-      enableRotate={true}
-      enableZoom={true}
+      enablePan={enablePan}
+      enableRotate={enableRotate}
+      enableZoom={enableZoom}
       {...props}
     />
   );

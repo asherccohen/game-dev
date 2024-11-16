@@ -1,6 +1,9 @@
 import { GridHelper } from 'three';
 
-export function GroundDebug() {
+export function GroundDebug({ debug = false }: { debug?: boolean }) {
+  if (!debug) {
+    return null;
+  }
   return (
     <primitive
       object={

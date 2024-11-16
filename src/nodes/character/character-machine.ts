@@ -1,3 +1,4 @@
+import { Vector3 } from 'three';
 import { assertEvent, assign, setup } from 'xstate';
 
 type Direction = 'up' | 'down' | 'left' | 'right' | null;
@@ -7,7 +8,8 @@ export const characterMachine = setup({
     context: {} as {
       position: { x: number; z: number };
       direction: Direction;
-      velocity: { x: number; y: number; z: number };
+      // velocity: { x: number; y: number; z: number };
+      velocity: Vector3;
       user: { name: string };
       stamina: number;
     },
@@ -91,34 +93,68 @@ export const characterMachine = setup({
       assertEvent(event, 'character.walk');
 
       switch (event.direction) {
-        case 'up':
+        case 'up': {
           // context.velocity.z = 1;
+
+          // return {
+          //   velocity: { z: 1, x: context.velocity.x, y: context.velocity.y },
+          // };
+          const moveVector = new Vector3(context.velocity.x, 0, 1);
+
           return {
-            velocity: { z: 1, x: context.velocity.x, y: context.velocity.y },
+            velocity: moveVector,
           };
-        case 'down':
+        }
+        case 'down': {
           // context.velocity.z = -1;
+          // return {
+          //   velocity: { z: -1, x: context.velocity.x, y: context.velocity.y },
+          // };
+          const moveVector = new Vector3(
+            context.velocity.x,
+            context.velocity.y,
+            -1,
+          );
+
           return {
-            velocity: { z: -1, x: context.velocity.x, y: context.velocity.y },
+            velocity: moveVector,
           };
-        case 'left':
+        }
+        case 'left': {
           // context.velocity.x = 1;
+          // return {
+          //   velocity: { x: -1, z: context.velocity.z, y: context.velocity.y },
+          // };
+
+          const moveVector = new Vector3(
+            -1,
+            context.velocity.y,
+            context.velocity.z,
+          );
+
           return {
-            velocity: { x: 1, z: context.velocity.z, y: context.velocity.y },
+            velocity: moveVector,
           };
-        case 'right':
+        }
+        case 'right': {
           // context.velocity.x = -1;
+          // return {
+          //   velocity: { x: 1, z: context.velocity.z, y: context.velocity.y },
+          // };
+          const moveVector = new Vector3(
+            1,
+            context.velocity.y,
+            context.velocity.z,
+          );
+
           return {
-            velocity: { x: -1, z: context.velocity.z, y: context.velocity.y },
+            velocity: moveVector,
           };
+        }
 
         default:
           return {
-            velocity: {
-              x: context.velocity.x,
-              z: context.velocity.z,
-              y: context.velocity.y,
-            },
+            velocity: context.velocity,
           };
       }
     }),
@@ -129,7 +165,8 @@ export const characterMachine = setup({
   context: {
     position: { x: 0, z: 0 },
     direction: 'up',
-    velocity: { x: 0, y: 0, z: 0 },
+    // velocity: { x: 0, y: 0, z: 0 },
+    velocity: new Vector3(),
     user: { name: 'Player' },
     stamina: 10,
   },

@@ -1,9 +1,9 @@
 import './App.css';
 
-import React, { PropsWithChildren, Suspense, useState } from 'react';
+import React, { PropsWithChildren, Suspense } from 'react';
 import GameScene from './game-scene';
 
-import { Html, useProgress } from '@react-three/drei';
+import { useProgress } from '@react-three/drei';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 
 export function ErrorFallback({
@@ -40,11 +40,11 @@ export function ErrorFallback({
 
 function Loader() {
   const { progress } = useProgress();
-  return <Html center>{progress} % loaded</Html>;
+  // return <Html center>{progress} % loaded</Html>;
+  return <div>{progress} % loaded</div>;
 }
 
 const App: React.FC = () => {
-  const [debugMode, setDebugMode] = useState<boolean>(false);
   return (
     <div
       style={{
@@ -56,14 +56,6 @@ const App: React.FC = () => {
         overflow: 'hidden',
       }}
     >
-      <form>
-        <label htmlFor="debug">Debug Mode:</label>
-        <input
-          type="checkbox"
-          id="debug"
-          onChange={() => setDebugMode(!debugMode)}
-        />
-      </form>
       <ErrorBoundary
         FallbackComponent={ErrorFallback}
         onReset={(details) => {
@@ -71,7 +63,7 @@ const App: React.FC = () => {
         }}
       >
         <Suspense fallback={<Loader />}>
-          <GameScene debug={debugMode} />
+          <GameScene />
         </Suspense>
       </ErrorBoundary>
     </div>

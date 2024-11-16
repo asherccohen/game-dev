@@ -30,16 +30,20 @@ export interface PerfPropsGui extends PerfProps {
   minimal?: boolean;
   className?: string;
   style?: object;
+  debug?: boolean;
 }
 //TODO: causes an infinite log and no metrics shown
-export function PerfDebug(props: PerfPropsGui) {
+export function PerfDebug({ debug = false, ...props }: PerfPropsGui) {
+  if (!debug) {
+    return null;
+  }
   return (
     <Perf position="top-right" minimal={false} showGraph={true} {...props} />
   );
 }
 
 //TODO: Extract props
-//TODO: Deosn't render
+//TODO: Doesn't render
 type StatsGlDebugProps = {
   id?: string;
   clearStatsGlStyle?: boolean;
@@ -47,9 +51,13 @@ type StatsGlDebugProps = {
   className?: string;
   // parent?: React.RefObject<HTMLElement>;
   // ref?: React.RefObject<HTMLElement>;
+  debug?: boolean;
 };
 
-export function StatsGlDebug(props: StatsGlDebugProps) {
+export function StatsGlDebug({ debug = false, ...props }: StatsGlDebugProps) {
+  if (!debug) {
+    return null;
+  }
   return <StatsGl className="stats" {...props} />;
 }
 
@@ -58,7 +66,11 @@ type StatsDebugProps = {
   showPanel?: number;
   className?: string;
   parent?: React.RefObject<HTMLElement>;
+  debug?: boolean;
 };
-export function StatsDebug(props: StatsDebugProps) {
+export function StatsDebug({ debug = false, ...props }: StatsDebugProps) {
+  if (!debug) {
+    return null;
+  }
   return <Stats showPanel={0} className="stats" {...props} />;
 }

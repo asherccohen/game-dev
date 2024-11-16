@@ -1,10 +1,16 @@
 import {
   CameraControlsProps,
+  OrthographicCamera as PrimitiveOrthographicCamera,
   PerspectiveCamera as PrimitivePerspectiveCamera,
 } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
+import {
+  OrthographicCameraProps as PrimitiveOrthographicCameraProps,
+  PerspectiveCameraProps as PrimitivePerspectiveCameraProps,
+  useFrame,
+  useThree,
+} from '@react-three/fiber';
 import { RefObject, useEffect, useRef } from 'react';
-import { Mesh, Texture, Vector3 } from 'three';
+import { Mesh, Vector3 } from 'three';
 
 interface CameraSetupProps {
   position?: [number, number, number];
@@ -112,18 +118,8 @@ export function IsometricCameraSetup() {
   return null;
 }
 
-type PerspectiveCameraProps = Omit<
-  JSX.IntrinsicElements['perspectiveCamera'],
-  'children'
-> & {
-  makeDefault?: boolean;
-  manual?: boolean;
-  children?: React.ReactNode | ((texture: Texture) => React.ReactNode);
-  frames?: number;
-  resolution?: number;
-  envMap?: Texture;
-};
+export type PerspectiveCameraProps = PrimitivePerspectiveCameraProps;
+export const PerspectiveCamera = PrimitivePerspectiveCamera;
 
-export function PerspectiveCamera(props: PerspectiveCameraProps) {
-  return <PrimitivePerspectiveCamera {...props} />;
-}
+export type OrthographicCameraProps = PrimitiveOrthographicCameraProps;
+export const OrthographicCamera = PrimitiveOrthographicCamera;

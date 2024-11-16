@@ -1,16 +1,22 @@
-import { Html, KeyboardControls, useProgress } from '@react-three/drei';
+import {
+  Environment,
+  Html,
+  KeyboardControls,
+  useProgress,
+} from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
 import React, { Suspense } from 'react';
-
+import { useEditorControls } from './libs/editor';
+import { GroundDebug } from './libs/ground';
 import { StatsDebug } from './libs/performance';
 import CustomCamera from './nodes/camera/root';
-import Character from './nodes/character/root';
+import { CharacterController } from './nodes/character/character-controller';
 import { keyboardMap } from './nodes/character/use-character-controls';
 import CustomControls from './nodes/controls/root';
-import Barbarian from './nodes/enemy/root';
 import Ground from './nodes/ground/root';
 import SceneLighting from './nodes/light/root';
+import CustomMap from './nodes/map/root';
 import Sky from './nodes/sky/root';
 
 function Loader() {
@@ -18,42 +24,73 @@ function Loader() {
   return <Html center>{progress} % loaded</Html>;
 }
 
-const GameScene: React.FC<{ debug?: boolean }> = ({ debug = false }) => {
-  return (
-    <Canvas>
-      <Suspense fallback={<Loader />}>
-        <SceneLighting debug={debug} />
+const GameScene: React.FC = () => {
+  const { characterControls, debugControls, mapControls, cameraControls } =
+    useEditorControls();
 
-        <Physics debug={debug}>
-          <KeyboardControls map={keyboardMap}>
-            <Character position={[5, 0, 5]} moveSpeed={5} />
-          </KeyboardControls>
-          <Barbarian position={[-5, 0, -5]} moveSpeed={5} />
-          <Ground debug={debug} />
+  return (
+    <KeyboardControls map={keyboardMap}>
+      <Canvas
+        shadows
+        camera={{ position: [3, 3, 3], near: 0.1, fov: 40 }}
+        style={{
+          touchAction: 'none',
+        }}
+      >
+        <Sky />
+        <Environment preset="sunset" />
+
+        <SceneLighting debug={debugControls.showLighting}>
+          <CustomCamera
+            position={cameraControls.position}
+            fov={cameraControls.fov}
+            near={cameraControls.near}
+            far={cameraControls.far}
+            debug={debugControls.showCamera}
+          />
+        </SceneLighting>
+
+        <Physics
+          debug={debugControls.showPhysics}
+          key={mapControls.map} //used to reset the physics world
+        >
+          <Suspense fallback={<Loader />}>
+            {mapControls.map === 'ground' ? (
+              <Ground
+                scale={mapControls.config.scale}
+                position={mapControls.config.position}
+              />
+            ) : (
+              <CustomMap
+                scale={mapControls.config.scale}
+                position={mapControls.config.position}
+                model={mapControls.model}
+              />
+            )}
+            <CharacterController
+              runSpeed={characterControls.RUN_SPEED}
+              moveSpeed={characterControls.WALK_SPEED}
+              rotationSpeed={characterControls.ROTATION_SPEED}
+            />
+
+            {/* <Character position={[5, 0, 5]} moveSpeed={5} /> */}
+            {/* <Barbarian position={[-5, 0, -5]} moveSpeed={5} /> */}
+          </Suspense>
+          <GroundDebug debug={debugControls.showGrid} />
         </Physics>
 
-        {/* Add environment to the scene */}
-        {/* <Environment preset="studio" background /> */}
+        <color attach="background" args={['#ececec']} />
 
-        <Sky />
+        {/* <PerfDebug  debug={debug.showStats}/> */}
+        <StatsDebug debug={debugControls.showStats} />
 
-        <CustomCamera
-          position={[0, 15, 45]}
-          fov={35}
-          near={0.1}
-          far={1000}
-          debug={debug}
+        <CustomControls
+          enablePan={debugControls.enableControls}
+          enableRotate={debugControls.enableControls}
+          enableZoom={debugControls.enableControls}
         />
-        <CustomControls debug={debug} />
-      </Suspense>
-
-      {debug ? (
-        <>
-          {/* <PerfDebug  /> */}
-          <StatsDebug />
-        </>
-      ) : null}
-    </Canvas>
+      </Canvas>
+    </KeyboardControls>
   );
 };
 
