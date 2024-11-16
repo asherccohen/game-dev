@@ -2,14 +2,11 @@ import { useLoader } from '@react-three/fiber';
 import { useEffect } from 'react';
 import { Mesh, MeshStandardMaterial, Object3D, TextureLoader } from 'three';
 import { FBXLoader } from 'three/examples/jsm/Addons.js';
-//TODO: add an asset loader to load with an import instead of keeping the files in the public folder
-// import barbarianSrc from "./resources/Characters/fbx/Barbarian.fbx"
+import knightModel from '../../libs/assets/characters/fbx/Knight.fbx';
+import knightTexture from '../../libs/assets/characters/fbx/knight_texture.png';
 
 export const useCharacterLoader = () => {
-  const fbxModel = useLoader(
-    FBXLoader,
-    './resources/Characters/fbx/Knight.fbx',
-  );
+  const fbxModel = useLoader(FBXLoader, knightModel);
   // const fbxModel = useFBX(modelPath);
   // const fbxModel = useLoader(FBXLoader, modelPath, (loader) => {
   //   // Customize loader behavior
@@ -20,10 +17,7 @@ export const useCharacterLoader = () => {
   // const fbxModel = useFBX(modelPath)
 
   // Load Textures
-  const colorTexture = useLoader(
-    TextureLoader,
-    './resources/Characters/fbx/knight_texture.png',
-  );
+  const colorTexture = useLoader(TextureLoader, knightTexture);
   // const normalTexture = useLoader(TextureLoader, '/path/to/normal_texture.png');
 
   useEffect(() => {

@@ -41,7 +41,22 @@ export function ErrorFallback({
 function Loader() {
   const { progress } = useProgress();
   // return <Html center>{progress} % loaded</Html>;
-  return <div>{progress} % loaded</div>;
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      {progress} % loaded
+    </div>
+  );
 }
 
 const App: React.FC = () => {

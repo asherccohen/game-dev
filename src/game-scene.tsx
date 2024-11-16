@@ -7,7 +7,7 @@ import {
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
 import React, { Suspense } from 'react';
-import { useEditorControls } from './libs/editor';
+import { Editor, useEditorControls } from './libs/editor';
 import { GroundDebug } from './libs/ground';
 import { StatsDebug } from './libs/performance';
 import CustomCamera from './nodes/camera/root';
@@ -30,6 +30,8 @@ const GameScene: React.FC = () => {
 
   return (
     <KeyboardControls map={keyboardMap}>
+      <Editor />
+
       <Canvas
         shadows
         camera={{ position: [3, 3, 3], near: 0.1, fov: 40 }}

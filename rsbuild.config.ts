@@ -3,6 +3,16 @@ import { pluginBabel } from '@rsbuild/plugin-babel';
 import { pluginReact } from '@rsbuild/plugin-react';
 
 export default defineConfig({
+  tools: {
+    rspack(config, { addRules }) {
+      addRules([
+        {
+          test: /\.(fbx|gltf|glb)$/,
+          type: 'asset/resource', // Treats files as separate assets
+        },
+      ]);
+    },
+  },
   plugins: [
     pluginReact(),
     pluginBabel({

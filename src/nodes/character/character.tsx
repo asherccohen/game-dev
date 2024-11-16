@@ -6,13 +6,14 @@ Command: npx gltfjsx@6.2.3 public/models/character.glb -o src/components/Charact
 import { useAnimations, useGLTF } from '@react-three/drei';
 import { useEffect, useRef } from 'react';
 import { Group } from 'three';
+import characterModel from '../../libs/assets/models/character.glb';
+
+useGLTF.preload(characterModel);
 
 export function Character({ animation, scale, ...props }: any) {
   const group = useRef<Group>();
 
-  const { nodes, materials, animations } = useGLTF(
-    './resources/models/character.glb',
-  );
+  const { nodes, materials, animations } = useGLTF(characterModel);
   const { actions } = useAnimations(animations, group);
 
   //@ts-expect-error Fix
@@ -71,5 +72,3 @@ export function Character({ animation, scale, ...props }: any) {
     </group>
   );
 }
-
-useGLTF.preload('./resources/models/character.glb');

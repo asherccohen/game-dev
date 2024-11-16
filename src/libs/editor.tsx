@@ -1,6 +1,11 @@
-import { useControls } from 'leva';
+import { Leva, useControls } from 'leva';
+import { useEffect, useState } from 'react';
 import { degToRad } from 'three/src/math/MathUtils.js';
 import { maps } from './map';
+// import { bezier } from '@leva-ui/plugin-bezier';
+// import groundModel from `./assets/models/${mapControls.map}.glb`
+
+// useGLTF.preload(characterModel);
 
 export const useEditorControls = () => {
   const debugControls = useControls('Debug', {
@@ -13,6 +18,7 @@ export const useEditorControls = () => {
     showShadows: false,
     showStats: false,
     showCamera: false,
+    // refMonitor: monitor(ref, { graph: true, interval: 30 }),
     // lighting: folder({
     // }),
   });
@@ -24,7 +30,19 @@ export const useEditorControls = () => {
   });
 
   const mapConfig = maps[mapControls.map];
-  const mapModel = `./resources/models/${mapControls.map}.glb`;
+  const [mapModel, setMapModel] = useState('');
+
+  useEffect(() => {
+    if (mapControls.map === 'ground') {
+      setMapModel('');
+    }
+
+    if (mapControls.map !== 'ground') {
+      import(`./assets/models/${mapControls.map}.glb`).then((res) => {
+        setMapModel(res);
+      });
+    }
+  }, [mapControls.map]);
 
   const characterControls = useControls('Character Control', {
     WALK_SPEED: { value: 0.8, min: 0.1, max: 4, step: 0.1 },
@@ -87,6 +105,8 @@ export const useEditorControls = () => {
     },
   });
 
+  // const { curve } = useControls({ curve: bezier() });
+
   return {
     debugControls,
     mapControls: {
@@ -97,4 +117,18 @@ export const useEditorControls = () => {
     characterControls,
     cameraControls,
   };
+};
+
+export const Editor = () => {
+  return (
+    <Leva
+      // theme={myTheme} // you can pass a custom theme (see the styling section)
+      // fill // default = false,  true makes the pane fill the parent dom node it's rendered in
+      // flat // default = false,  true removes border radius and shadow
+      // oneLineLabels // default = false, alternative layout for labels, with labels and fields on separate rows
+      // hideTitleBar // default = false, hides the GUI header
+      collapsed // default = false, when true the GUI is collpased
+      // hidden // default = false, when true the GUI is hidden
+    />
+  );
 };

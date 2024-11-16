@@ -5,8 +5,6 @@ import React, { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { enemyMachine } from './enemy-machine';
 import { useEnemyLoader } from './use-enemy-loader';
-//TODO: add an asset loader to load with an import instead of keeping the files in the public folder
-// import barbarianSrc from "./resources/Characters/fbx/Barbarian.fbx"
 
 interface BarbarianProps extends RigidBodyProps {
   moveSpeed?: number;
