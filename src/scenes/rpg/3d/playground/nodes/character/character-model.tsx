@@ -10,7 +10,7 @@ import { Group } from 'three';
 
 useGLTF.preload(characterModel);
 
-export function Character({ animation, scale, ...props }: any) {
+export function CharacterModel({ animation, scale, ...props }: any) {
   const group = useRef<Group>();
 
   const { nodes, materials, animations } = useGLTF(characterModel);
