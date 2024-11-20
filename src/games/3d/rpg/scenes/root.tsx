@@ -6,25 +6,56 @@ import {
 } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
+import { Editor, useEditorControls } from 'libs/editor';
+import { GroundDebug } from 'libs/ground';
+import { StatsDebug } from 'libs/performance';
+import CustomCamera from 'nodes/camera/root';
+import { CharacterController } from 'nodes/character/character-controller';
+import { keyboardMap } from 'nodes/character/use-character-controls';
+import CustomControls from 'nodes/controls/root';
+import Ground from 'nodes/ground/root';
+import SceneLighting from 'nodes/light/root';
+import CustomMap from 'nodes/map/root';
+import Sky from 'nodes/sky/root';
 import React, { Suspense } from 'react';
-import { Editor, useEditorControls } from './libs/editor';
-import { GroundDebug } from './libs/ground';
-import { StatsDebug } from './libs/performance';
-import CustomCamera from './nodes/camera/root';
-import { CharacterController } from './nodes/character/character-controller';
-import { keyboardMap } from './nodes/character/use-character-controls';
-import CustomControls from './nodes/controls/root';
-import Ground from './nodes/ground/root';
-import SceneLighting from './nodes/light/root';
-import CustomMap from './nodes/map/root';
-import Sky from './nodes/sky/root';
+import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 
-function Loader() {
+export function Loader() {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      Loading...
+    </div>
+  );
+}
+
+export function ErrorBoundary() {
+  let error = useRouteError();
+  return isRouteErrorResponse(error) ? (
+    <h1>
+      {error.status} {error.statusText}
+    </h1>
+  ) : (
+    <h1>There was an error</h1>
+  );
+}
+
+function SceneLoader() {
   const { progress } = useProgress();
   return <Html center>{progress} % loaded</Html>;
 }
 
-const GameScene: React.FC = () => {
+export const Component: React.FC = () => {
   const { characterControls, debugControls, mapControls, cameraControls } =
     useEditorControls();
 
@@ -56,7 +87,7 @@ const GameScene: React.FC = () => {
           debug={debugControls.showPhysics}
           key={mapControls.map} //used to reset the physics world
         >
-          <Suspense fallback={<Loader />}>
+          <Suspense fallback={<SceneLoader />}>
             {mapControls.map === 'ground' ? (
               <Ground
                 scale={mapControls.config.scale}
@@ -96,4 +127,4 @@ const GameScene: React.FC = () => {
   );
 };
 
-export default GameScene;
+Component.displayName = 'GameScene';

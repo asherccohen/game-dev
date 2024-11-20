@@ -3,6 +3,10 @@ import { pluginBabel } from '@rsbuild/plugin-babel';
 import { pluginReact } from '@rsbuild/plugin-react';
 
 export default defineConfig({
+  // source: {
+  //   // Enable dynamic imports for model files
+  //   dynamicImportMode: 'eager', // or 'lazy'
+  // },
   tools: {
     rspack(config, { addRules }) {
       addRules([

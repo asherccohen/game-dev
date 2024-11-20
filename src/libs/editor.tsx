@@ -1,3 +1,4 @@
+import { useGLTF } from '@react-three/drei';
 import { Leva, useControls } from 'leva';
 import { useEffect, useState } from 'react';
 import { degToRad } from 'three/src/math/MathUtils.js';
@@ -6,6 +7,32 @@ import { maps } from './map';
 // import groundModel from `./assets/models/${mapControls.map}.glb`
 
 // useGLTF.preload(characterModel);
+
+// Dynamically import model based on map name
+const loadModel = async (mapName: string) => {
+  try {
+    const model = await import(`./assets/models/${mapName}.glb`);
+    return model.default; // Return the imported asset
+  } catch (error) {
+    console.error('Failed to load model:', error);
+    throw error;
+  }
+};
+
+// Preload models if known in advance
+const preloadGLTFModels = async (mapNames: string[]) => {
+  for (const name of mapNames) {
+    useGLTF.preload(name);
+  }
+};
+
+// await preloadGLTFModels(Object.keys(maps));
+
+const preloadModels = async (mapNames: string[]) => {
+  return Promise.all(
+    mapNames.map((name) => import(`./assets/models/${name}.glb`)),
+  );
+};
 
 export const useEditorControls = () => {
   const debugControls = useControls('Debug', {
@@ -38,9 +65,14 @@ export const useEditorControls = () => {
     }
 
     if (mapControls.map !== 'ground') {
-      import(`./assets/models/${mapControls.map}.glb`).then((res) => {
-        setMapModel(res);
-      });
+      // const modelPath = await loadModel(mapControls.map);
+      loadModel(mapControls.map)
+        .then((res) => {
+          setMapModel(res);
+        })
+        .catch((error) => {
+          throw error;
+        });
     }
   }, [mapControls.map]);
 
