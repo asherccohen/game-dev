@@ -35,6 +35,8 @@
     "Prisma.prisma",
     "kuscamara.remove-unused-imports",
     "ms-playwright.playwright",
-    "slevesque.vscode-3dviewer"
+    "slevesque.vscode-3dviewer",
+    "michead.vscode-mesh-viewer",
+    "cesium.gltf-vscode"
   ]
 }
