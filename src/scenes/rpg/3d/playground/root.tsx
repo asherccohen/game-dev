@@ -13,7 +13,7 @@ import React, { Suspense } from 'react';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 import CustomCamera from './nodes/camera/root';
 import { useCameraControls } from './nodes/camera/use-camera-controls';
-import { CharacterController } from './nodes/character/character-controller';
+import Character from './nodes/character/root';
 import { useCharacterControls } from './nodes/character/use-character-controls';
 import { keyboardMap } from './nodes/character/use-character-keyboard';
 import CustomControls from './nodes/controls/root';
@@ -105,7 +105,7 @@ export const Component: React.FC = () => {
                 model={mapControls.model}
               />
             )}
-            <CharacterController
+            <Character
               runSpeed={characterControls.RUN_SPEED}
               moveSpeed={characterControls.WALK_SPEED}
               rotationSpeed={characterControls.ROTATION_SPEED}
