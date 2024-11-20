@@ -30,7 +30,7 @@ interface ControlsProps {
   keyboardMap?: typeof keyboardMap;
 }
 
-export const useCharacterControls = ({
+export const useCharacterKeyboard = ({
   onMoveForward,
   onMoveBack,
   onMoveLeft,

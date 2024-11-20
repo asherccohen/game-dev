@@ -1,13 +1,13 @@
 import { useHelper } from '@react-three/drei';
 
-import { useRef } from 'react';
-import { CameraHelper, OrthographicCamera, PerspectiveCamera } from 'three';
 import {
   OrthographicCameraProps,
   PerspectiveCameraProps,
   //  PerspectiveCamera as PrimitivePerspectiveCamera,
   OrthographicCamera as PrimitiveOrthographicCamera,
-} from '../../libs/camera';
+} from 'libs/camera';
+import { useRef } from 'react';
+import { CameraHelper, OrthographicCamera, PerspectiveCamera } from 'three';
 
 const CustomCamera = ({
   debug = false,

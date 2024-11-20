@@ -9,16 +9,19 @@ import { Physics } from '@react-three/rapier';
 import { Editor, useEditorControls } from 'libs/editor';
 import { GroundDebug } from 'libs/ground';
 import { StatsDebug } from 'libs/performance';
-import CustomCamera from 'nodes/camera/root';
-import { CharacterController } from 'nodes/character/character-controller';
-import { keyboardMap } from 'nodes/character/use-character-controls';
-import CustomControls from 'nodes/controls/root';
-import Ground from 'nodes/ground/root';
-import SceneLighting from 'nodes/light/root';
-import CustomMap from 'nodes/map/root';
-import Sky from 'nodes/sky/root';
 import React, { Suspense } from 'react';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
+import CustomCamera from './nodes/camera/root';
+import { useCameraControls } from './nodes/camera/use-camera-controls';
+import { CharacterController } from './nodes/character/character-controller';
+import { useCharacterControls } from './nodes/character/use-character-controls';
+import { keyboardMap } from './nodes/character/use-character-keyboard';
+import CustomControls from './nodes/controls/root';
+import Ground from './nodes/ground/root';
+import SceneLighting from './nodes/light/root';
+import CustomMap from './nodes/map/root';
+import { useMapControls } from './nodes/map/use-map-controls';
+import Sky from './nodes/sky/root';
 
 export function Loader() {
   return (
@@ -56,8 +59,10 @@ function SceneLoader() {
 }
 
 export const Component: React.FC = () => {
-  const { characterControls, debugControls, mapControls, cameraControls } =
-    useEditorControls();
+  const { debugControls } = useEditorControls();
+  const characterControls = useCharacterControls();
+  const cameraControls = useCameraControls();
+  const mapControls = useMapControls();
 
   return (
     <KeyboardControls map={keyboardMap}>

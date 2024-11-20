@@ -1,8 +1,8 @@
-import ErrorPage from 'error-page';
-import Layout from 'games/layout';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
+import ErrorPage from 'routes/error';
+import Layout from 'routes/layout';
 
 const router = createBrowserRouter(
   [
@@ -17,7 +17,7 @@ const router = createBrowserRouter(
       children: [
         {
           path: '/',
-          lazy: () => import('./games/3d/rpg/scenes/root'),
+          lazy: () => import('./games/3d/rpg/scenes/playground/root'),
         },
       ],
     },
