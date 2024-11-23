@@ -7,8 +7,8 @@ import {
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
 import { Editor, useEditorControls } from 'libs/editor';
-import { GroundDebug } from 'libs/ground';
 import { StatsDebug } from 'libs/performance';
+import { GroundDebug } from 'libs/terrain/ground';
 import React, { Suspense } from 'react';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 import CustomCamera from './nodes/camera/root';

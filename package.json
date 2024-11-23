@@ -16,6 +16,7 @@
     "@react-three/fiber": "^8.17.10",
     "@react-three/postprocessing": "^2.16.3",
     "@react-three/rapier": "^1.5.0",
+    "@rive-app/react-canvas": "^4.16.6",
     "@xstate/graph": "^3.0.0",
     "@xstate/react": "^5.0.0",
     "@xstate/store": "^2.6.1",

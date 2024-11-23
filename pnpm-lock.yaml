@@ -17,6 +17,9 @@ dependencies:
   '@react-three/rapier':
     specifier: ^1.5.0
     version: 1.5.0(@react-three/fiber@8.17.10)(react@18.3.1)(three@0.170.0)
+  '@rive-app/react-canvas':
+    specifier: ^4.16.6
+    version: 4.16.6(react@18.3.1)
   '@xstate/graph':
     specifier: ^3.0.0
     version: 3.0.0(xstate@5.19.0)
@@ -1217,6 +1220,19 @@ packages:
   /@remix-run/router@1.21.0:
     resolution: {integrity: sha512-xfSkCAchbdG5PnbrKqFWwia4Bi61nH+wm8wLEqfHDyp7Y3dZzgqS2itV8i4gAq9pC2HsTpwyBC6Ds8VHZ96JlA==}
     engines: {node: '>=14.0.0'}
+    dev: false
+
+  /@rive-app/canvas@2.23.10:
+    resolution: {integrity: sha512-xD3RnnOZmpXwC2CztQLj5ZZk1MbXrJfSgaXTKYm+G7LxAOfBo5FUFaX4l7TI5dbp1SiD/7RuiSrSw8e3IQqDGg==}
+    dev: false
+
+  /@rive-app/react-canvas@4.16.6(react@18.3.1):
+    resolution: {integrity: sha512-A+B9tVcjjX9WN3pCQsDm4jCMUvbtL+e6MfSoWsSQL6L7KJlWko+4I92+vhiNzw+mcJZClvdCDd1csuMA4+Pl6A==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@rive-app/canvas': 2.23.10
+      react: 18.3.1
     dev: false
 
   /@rsbuild/core@1.1.0:

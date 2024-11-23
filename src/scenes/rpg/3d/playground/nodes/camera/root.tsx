@@ -5,7 +5,7 @@ import {
   PerspectiveCameraProps,
   //  PerspectiveCamera as PrimitivePerspectiveCamera,
   OrthographicCamera as PrimitiveOrthographicCamera,
-} from 'libs/camera';
+} from 'libs/camera/camera';
 import { useRef } from 'react';
 import { CameraHelper, OrthographicCamera, PerspectiveCamera } from 'three';
 

@@ -1,5 +1,5 @@
 import { useControls } from 'leva';
-import { maps } from 'libs/map';
+import { maps } from 'libs/terrain/map';
 import { useEffect, useState } from 'react';
 
 // useGLTF.preload(characterModel);
