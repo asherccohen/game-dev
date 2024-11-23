@@ -14,6 +14,10 @@ export default defineConfig({
           test: /\.(fbx|gltf|glb)$/,
           type: 'asset/resource', // Treats files as separate assets
         },
+        {
+          test: /\.(mp3|wav)$/,
+          type: 'asset/resource', // Treats files as separate assets
+        },
       ]);
     },
   },
