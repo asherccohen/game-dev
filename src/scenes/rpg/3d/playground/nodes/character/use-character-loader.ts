@@ -1,6 +1,6 @@
 import { useLoader } from '@react-three/fiber';
-import knightModel from 'libs/assets/characters/fbx/Knight.fbx';
-import knightTexture from 'libs/assets/characters/fbx/knight_texture.png';
+import knightModel from 'libs/assets/3D/characters/fbx/Knight.fbx';
+import knightTexture from 'libs/assets/3D/characters/fbx/knight_texture.png';
 import { useEffect } from 'react';
 import { Mesh, MeshStandardMaterial, Object3D, TextureLoader } from 'three';
 import { FBXLoader } from 'three/examples/jsm/Addons.js';

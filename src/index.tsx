@@ -16,12 +16,16 @@ const router = createBrowserRouter(
       errorElement: <ErrorPage />,
       children: [
         {
-          path: '/play',
+          path: '/3D/playground',
           lazy: () => import('./scenes/rpg/3d/playground/root'),
         },
+        // {
+        //   path: '/edit',
+        //   lazy: () => import('./scenes/rpg/3d/playground/root'),
+        // },
         {
-          path: '/edit',
-          lazy: () => import('./scenes/rpg/3d/playground/root'),
+          path: '/2D/playground',
+          lazy: () => import('./scenes/rpg/2D/playground/root'),
         },
       ],
     },

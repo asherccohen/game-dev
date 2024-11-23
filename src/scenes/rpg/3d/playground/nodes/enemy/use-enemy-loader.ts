@@ -1,6 +1,6 @@
 import { useLoader } from '@react-three/fiber';
-import barbarianModel from 'libs/assets/characters/fbx/Barbarian.fbx';
-import barbarianTexture from 'libs/assets/characters/fbx/barbarian_texture.png';
+import barbarianModel from 'libs/assets/3D/characters/fbx/Barbarian.fbx';
+import barbarianTexture from 'libs/assets/3D/characters/fbx/barbarian_texture.png';
 import { useEffect } from 'react';
 import { Mesh, MeshStandardMaterial, Object3D, TextureLoader } from 'three';
 import { FBXLoader } from 'three/examples/jsm/Addons.js';

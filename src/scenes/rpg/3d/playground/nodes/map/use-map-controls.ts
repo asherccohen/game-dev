@@ -15,14 +15,14 @@ import { useEffect, useState } from 'react';
 
 // const preloadModels = async (mapNames: string[]) => {
 //   return Promise.all(
-//     mapNames.map((name) => import(`libs/assets/models/${name}.glb`)),
+//     mapNames.map((name) => import(`libs/assets/3D/models/${name}.glb`)),
 //   );
 // };
 
 // Dynamically import model based on map name
 const loadModel = async (mapName: string) => {
   try {
-    const model = await import(`libs/assets/models/${mapName}.glb`);
+    const model = await import(`libs/assets/3D/models/${mapName}.glb`);
     return model.default; // Return the imported asset
   } catch (error) {
     console.error('Failed to load model:', error);

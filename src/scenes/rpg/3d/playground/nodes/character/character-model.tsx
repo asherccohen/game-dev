@@ -4,7 +4,7 @@ Command: npx gltfjsx@6.2.3 public/models/character.glb -o src/components/Charact
 */
 
 import { useAnimations, useGLTF } from '@react-three/drei';
-import characterModel from 'libs/assets/models/character.glb';
+import characterModel from 'libs/assets/3D/models/character.glb';
 import { useEffect, useRef } from 'react';
 import { Group } from 'three';
 

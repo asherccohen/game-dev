@@ -14,11 +14,20 @@ const Layout = ({ children }: PropsWithChildren) => {
           justifyContent: 'center',
         }}
       >
-        <NavLink to="play" style={{ color: 'white', textDecoration: 'none' }}>
-          Play
+        <NavLink
+          to="3D/playground"
+          style={{ color: 'white', textDecoration: 'none' }}
+        >
+          3D RPG
         </NavLink>
-        <NavLink to="edit" style={{ color: 'white', textDecoration: 'none' }}>
+        {/* <NavLink to="3D/playground" style={{ color: 'white', textDecoration: 'none' }}>
           Edit
+        </NavLink> */}
+        <NavLink
+          to="2D/playground"
+          style={{ color: 'white', textDecoration: 'none' }}
+        >
+          2D RPG
         </NavLink>
       </nav>
       <main
