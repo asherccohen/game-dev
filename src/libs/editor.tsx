@@ -1,4 +1,5 @@
 import { Leva, useControls } from 'leva';
+import { parseAsBoolean, useQueryState } from 'nuqs';
 
 export const useEditorControls = () => {
   const debugControls = useControls('Debug', {
@@ -29,7 +30,13 @@ export const useBezierControls = () => {
   return null;
 };
 
-export const Editor = () => {
+export const useDebug = () => {
+  const debugStore = useQueryState('debug', parseAsBoolean.withDefault(false));
+
+  return debugStore;
+};
+
+export const Editor = ({ debug = false }: { debug?: boolean }) => {
   return (
     <Leva
       // theme={myTheme} // you can pass a custom theme (see the styling section)
@@ -38,7 +45,7 @@ export const Editor = () => {
       // oneLineLabels // default = false, alternative layout for labels, with labels and fields on separate rows
       // hideTitleBar // default = false, hides the GUI header
       collapsed // default = false, when true the GUI is collpased
-      // hidden // default = false, when true the GUI is hidden
+      hidden={!debug} // default = false, when true the GUI is hidden
     />
   );
 };

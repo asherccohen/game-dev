@@ -2,7 +2,7 @@ import { Html, KeyboardControls, useProgress } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
 import CustomControls from 'libs/controls/root';
-import { Editor, useEditorControls } from 'libs/editor';
+import { Editor, useDebug, useEditorControls } from 'libs/editor';
 import { StatsDebug } from 'libs/performance';
 import { Suspense } from 'react';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
@@ -47,10 +47,11 @@ function SceneLoader() {
 }
 
 export const Component = () => {
+  const [debug] = useDebug();
   const { debugControls } = useEditorControls();
   return (
     <KeyboardControls map={keyboardMap}>
-      <Editor />
+      <Editor debug={debug} />
 
       <Canvas
         // shadows

@@ -6,7 +6,7 @@ import {
 } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
-import { Editor, useEditorControls } from 'libs/editor';
+import { Editor, useDebug, useEditorControls } from 'libs/editor';
 import { StatsDebug } from 'libs/performance';
 import { GroundDebug } from 'libs/terrain/ground';
 import React, { Suspense } from 'react';
@@ -59,6 +59,7 @@ function SceneLoader() {
 }
 
 export const Component: React.FC = () => {
+  const [debug] = useDebug();
   const { debugControls } = useEditorControls();
   const characterControls = useCharacterControls();
   const cameraControls = useCameraControls();
@@ -66,7 +67,7 @@ export const Component: React.FC = () => {
 
   return (
     <KeyboardControls map={keyboardMap}>
-      <Editor />
+      <Editor debug={debug} />
 
       <Canvas
         shadows
