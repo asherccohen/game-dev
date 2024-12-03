@@ -10,7 +10,7 @@ import { Editor, useDebug, useEditorControls } from 'libs/editor';
 import { StatsDebug } from 'libs/performance';
 import { GroundDebug } from 'libs/terrain/ground';
 import React, { Suspense } from 'react';
-import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
+import { isRouteErrorResponse, useRouteError } from 'react-router';
 import CustomControls from '../../../../libs/controls/root';
 import CustomCamera from './nodes/camera/root';
 import { useCameraControls } from './nodes/camera/use-camera-controls';

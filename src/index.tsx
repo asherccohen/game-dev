@@ -1,6 +1,8 @@
+import { NuqsAdapter } from 'nuqs/adapters/react-router';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Outlet } from 'react-router';
+import { RouterProvider } from 'react-router/dom';
 import ErrorPage from 'scenes/error';
 import Layout from 'scenes/layout';
 
@@ -10,7 +12,9 @@ const router = createBrowserRouter(
       path: '/',
       element: (
         <Layout>
-          <Outlet />
+          <NuqsAdapter>
+            <Outlet />
+          </NuqsAdapter>
         </Layout>
       ),
       errorElement: <ErrorPage />,

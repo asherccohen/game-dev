@@ -5,7 +5,7 @@ import CustomControls from 'libs/controls/root';
 import { Editor, useDebug, useEditorControls } from 'libs/editor';
 import { StatsDebug } from 'libs/performance';
 import { Suspense } from 'react';
-import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
+import { isRouteErrorResponse, useRouteError } from 'react-router';
 import Character from './nodes/character/character-controller';
 import { keyboardMap } from './nodes/character/use-character-keyboard';
 import Ground from './nodes/ground/root';

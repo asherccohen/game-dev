@@ -2,7 +2,7 @@ import {
   ErrorResponse,
   isRouteErrorResponse,
   useRouteError,
-} from 'react-router-dom';
+} from 'react-router';
 import invariant from 'tiny-invariant';
 
 type RouteError = {

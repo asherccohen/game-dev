@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import './layout.css';
 
 import { PropsWithChildren } from 'react';
