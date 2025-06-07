@@ -22,7 +22,7 @@
     "exactOptionalPropertyTypes": true,
 
     "esModuleInterop": true,
-    "types": ["three", "@react-three/fiber"]
+    "types": ["three", "@types/three", "@react-three/fiber"]
   },
   "include": ["src"]
 }
