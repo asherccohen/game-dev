@@ -18,6 +18,11 @@ export default defineConfig({
           test: /\.(mp3|wav)$/,
           type: 'asset/resource', // Treats files as separate assets
         },
+        // {
+        //   test: /\.css$/,
+        //   use: ['postcss-loader'],
+        //   type: 'css',
+        // },
       ]);
     },
   },
