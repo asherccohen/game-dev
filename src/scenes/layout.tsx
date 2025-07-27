@@ -1,4 +1,3 @@
-import { NavLink } from 'react-router';
 import './layout.css';
 
 import { PropsWithChildren } from 'react';
@@ -12,7 +11,7 @@ const Layout = ({
 }>) => {
   return (
     <div>
-      <nav
+      {/* <nav
         style={{
           display: 'flex',
           gap: '3em',
@@ -33,7 +32,7 @@ const Layout = ({
             {link.label}
           </NavLink>
         ))}
-      </nav>
+      </nav> */}
       <main
         style={{
           width: '100vw',

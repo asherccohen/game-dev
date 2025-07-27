@@ -937,7 +937,7 @@ const GLTFLoader = (function () {
     6406: THREE.AlphaFormat,
     6407: THREE.RGBFormat,
     6408: THREE.RGBAFormat,
-    // 6409: THREE.LuminanceFormat,
+    // 6409: THREE.LuminanceFormat, // TODO: issue in three.js use RedFormat
     6410: THREE.LuminanceAlphaFormat,
   };
 

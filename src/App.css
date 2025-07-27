@@ -1,4 +1,6 @@
+
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
 
 body {
   margin: 0;

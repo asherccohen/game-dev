@@ -12,6 +12,7 @@ type RouteError = {
 
 function ErrorPage() {
   const error = useRouteError() as (RouteError | ErrorResponse) | null;
+  console.error('🚀 ~ ErrorPage ~ error:', error);
 
   invariant(error, 'error should be of type RouteError | ErrorResponse');
 
