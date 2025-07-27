@@ -29,8 +29,8 @@ export const Terminal: React.FC = () => {
   }, [history]);
 
   return (
-    <div className="h-screen bg-black text-green-500 p-4 font-mono">
-      <div ref={terminalRef} className="h-[calc(100vh-100px)] overflow-y-auto">
+    <div className="bg-black text-green-500 p-4 font-mono h-full w-full flex flex-col">
+      <div ref={terminalRef} className="flex-1 overflow-y-auto">
         {history.map((line, i) => (
           <div key={i} className="whitespace-pre-wrap">
             {line}

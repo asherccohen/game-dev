@@ -1,7 +1,7 @@
 import { Html } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 
 const Panel = ({
   title,
@@ -504,7 +504,7 @@ const QuickActions = () => {
 };
 
 // Main HUD Layout
-const HUDOverlay = () => (
+const HUDOverlay = ({ children }: PropsWithChildren) => (
   <Html fullscreen>
     <div className="w-full h-full p-4 grid grid-cols-3 gap-4 overflow-auto">
       {/* Left Column */}
@@ -512,25 +512,24 @@ const HUDOverlay = () => (
         <SystemStatus />
         <MissionBrief />
         <AuthenticationPanel />
+        <EnvironmentalData />
       </div>
 
       {/* Center Column */}
-      <div className="space-y-0">
-        <ThreatAssessment />
-        <EnvironmentalData />
-      </div>
+      <div className="space-y-0">{children}</div>
 
       {/* Right Column */}
       <div className="space-y-0">
         <DiagnosticFeed />
         <NetworkStatus />
         <QuickActions />
+        <ThreatAssessment />
       </div>
     </div>
   </Html>
 );
 
-export const HUD = () => (
+export const HUD = ({ children }: PropsWithChildren) => (
   <div className="w-full h-screen bg-gradient-to-br from-sandstone via-desertTan to-weatheredMetal relative overflow-hidden">
     {/* Cinematic background patterns inspired by the desert scene */}
     <div className="absolute inset-0 opacity-10">
@@ -562,7 +561,7 @@ export const HUD = () => (
         <meshStandardMaterial color="#8FBC8F" opacity={0.1} transparent />
       </mesh>
 
-      <HUDOverlay />
+      <HUDOverlay>{children}</HUDOverlay>
     </Canvas>
   </div>
 );
