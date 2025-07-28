@@ -46,7 +46,7 @@ const Panel = ({
       {/* Cinematic title bar */}
       <div className="relative z-10 mb-3 pb-2 border-b border-copperWire/30">
         <div className="flex items-center justify-between">
-          <span className="text-xs uppercase text-oxidizedGreen tracking-widest font-medium">
+          <span className="text-xs uppercase text-secondary tracking-widest font-medium">
             {title}
           </span>
           <div className="flex gap-1">
@@ -79,7 +79,9 @@ const SystemStatus = () => {
     <Panel title="System Status" variant="success">
       <div className="space-y-3">
         <div className="text-parchment">
-          <div className="text-sm font-medium">SecUnit Online</div>
+          <div className="text-sm font-medium text-secondary">
+            SecUnit Online
+          </div>
           <div className="text-xs text-mutedBronze">
             {time.toLocaleTimeString('en-US', { hour12: false })} UTC
           </div>
@@ -134,7 +136,9 @@ const MissionBrief = () => {
     <Panel title="Mission Brief" variant="primary">
       <div className="space-y-3">
         <div className="text-parchment">
-          <div className="text-sm font-medium">Current Phase</div>
+          <div className="text-sm font-medium text-secondary">
+            Current Phase
+          </div>
           <div className="text-dustyGold font-bold text-lg">{missionPhase}</div>
         </div>
 
@@ -511,8 +515,8 @@ const HUDOverlay = ({ children }: PropsWithChildren) => (
       <div className="space-y-0">
         <SystemStatus />
         <MissionBrief />
-        <AuthenticationPanel />
         <EnvironmentalData />
+        <AuthenticationPanel />
       </div>
 
       {/* Center Column */}

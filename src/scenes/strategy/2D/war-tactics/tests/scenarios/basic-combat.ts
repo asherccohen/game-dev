@@ -65,5 +65,6 @@ export const createBasicCombatScenario = () => {
       forest,
     },
     systems,
+    factories,
   };
 };

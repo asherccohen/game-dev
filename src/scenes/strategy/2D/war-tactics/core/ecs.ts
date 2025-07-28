@@ -40,13 +40,34 @@ export interface Order {
 
 // Entity Types
 export type Unit = Position & Combat & Status & Identity;
-export type TerrainNode = {
+// export type TerrainNode = {
+//   id: string;
+//   name: string;
+//   type: 'ridge' | 'valley' | 'urban' | 'forest' | 'plains';
+//   cover: number;
+//   connections: string[];
+// };
+export type TerrainType =
+  | 'ridge'
+  | 'valley'
+  | 'urban'
+  | 'forest'
+  | 'plains'
+  | 'objective';
+
+export interface TerrainNode {
   id: string;
+  type: TerrainType;
+  zone: string;
   name: string;
-  type: 'ridge' | 'valley' | 'urban' | 'forest' | 'plains';
-  cover: number;
   connections: string[];
-};
+  cover: number;
+  properties: {
+    isObjective?: boolean;
+    coverValue?: number;
+    movementCost?: number;
+  };
+}
 
 // Create World
 export const createGameWorld = () => {
@@ -75,7 +96,7 @@ export const createGameWorld = () => {
     }
   };
 
-  const combatSystem = (_delta: number) => {
+  const combatSystem = (delta: number) => {
     const engagedUnits = Array.from(world.entities).filter(
       (e): e is Unit =>
         'state' in e && e.state === 'engaged' && 'firepower' in e,
@@ -101,12 +122,14 @@ export const createGameWorld = () => {
         const baseDamage = unit.firepower || 0;
         const effectiveDamage = baseDamage * (1 - coverModifier);
 
-        // Apply morale damage
-        enemy.morale = Math.max(0, enemy.morale - effectiveDamage);
+        // Apply morale damage scaled by time
+        const timeDamage = effectiveDamage * delta;
+        enemy.morale = Math.max(0, enemy.morale - timeDamage);
 
         // Update ammunition and status
         if (unit.ammunition !== undefined) {
-          unit.ammunition = Math.max(0, unit.ammunition - 1);
+          const ammoUse = delta; // Ammo use per second
+          unit.ammunition = Math.max(0, unit.ammunition - ammoUse);
         }
 
         // Check for low ammo retreat
@@ -117,14 +140,15 @@ export const createGameWorld = () => {
     }
   };
 
-  const moraleSystem = (_delta: number) => {
+  const moraleSystem = (delta: number) => {
     for (const entity of world.entities) {
       if ('morale' in entity && 'state' in entity) {
         const unit = entity as Unit;
 
         // Units in combat lose morale over time
         if (unit.state === 'engaged') {
-          unit.morale = Math.max(0, unit.morale - 5);
+          const combatStress = 5 * delta; // 5 morale loss per second
+          unit.morale = Math.max(0, unit.morale - combatStress);
         }
 
         // Low morale triggers retreat
@@ -134,7 +158,8 @@ export const createGameWorld = () => {
 
         // Units not in combat slowly recover morale
         if (unit.state === 'idle') {
-          unit.morale = Math.min(100, unit.morale + 2);
+          const recovery = 2 * delta; // 2 morale recovery per second
+          unit.morale = Math.min(100, unit.morale + recovery);
         }
       }
     }
@@ -176,6 +201,12 @@ export const createGameWorld = () => {
     type,
     cover: getTerrainCover(type),
     connections,
+    zone: name, // Assuming zone is the same as name for simplicity
+    properties: {
+      isObjective: type === 'objective',
+      coverValue: getTerrainCover(type),
+      movementCost: 1, // Default movement cost, can be adjusted per terrain type
+    },
   });
 
   return {
@@ -191,6 +222,8 @@ export const createGameWorld = () => {
     },
   };
 };
+
+export type GameWorld = ReturnType<typeof createGameWorld>;
 
 // Helper Functions
 function getUnitBaseStats(type: UnitType): Partial<Unit> {
@@ -213,6 +246,7 @@ function getTerrainCover(type: TerrainNode['type']): number {
     urban: 90,
     forest: 70,
     plains: 20,
+    objective: 100, // Objectives provide maximum cover
   };
 
   return cover[type];

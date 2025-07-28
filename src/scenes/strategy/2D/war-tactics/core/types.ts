@@ -31,9 +31,9 @@ export interface Terrain {
 export interface Order {
   unit: string;
   action: 'move' | 'attack' | 'defend' | 'retreat' | 'support';
-  target?: string;
-  destination?: string;
-  time_constraint?: string;
+  target?: string | undefined;
+  destination?: string | undefined;
+  time_constraint?: string | undefined;
   modifiers: string[];
 }
 

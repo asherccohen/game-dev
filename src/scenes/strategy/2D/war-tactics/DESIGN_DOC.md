@@ -401,6 +401,42 @@ HQ: Supplies delayed due to weather.
 
 ---
 
+### COMMAND EXAMPLE
+
+Move Commands
+
+```bash
+move Alpha Squad to Ridge Point
+move Bravo Squad to Valley Beta before 1200Z
+move Charlie Squad to Forest Edge under radio silence
+move Delta Squad to High Ground before 1500Z under smoke cover and radio silence
+```
+
+Attack Commands
+
+```bash
+attack Enemy Squad with Alpha Squad
+attack Hostile Unit with Bravo Squad using suppressing fire
+attack Enemy Position with Charlie Squad using flanking maneuver and artillery support
+```
+
+Defend Commands
+
+```bash
+defend Ridge Point with Alpha Squad
+defend Valley Beta with Bravo Squad
+defend Forest Edge with Charlie Squad
+```
+
+Retreat Commands
+
+```bash
+retreat Alpha Squad
+retreat Bravo Squad to Ridge Point
+retreat Charlie Squad to Valley Beta when under heavy fire
+retreat Delta Squad when morale low
+```
+
 ---
 
 ## 👣 Next Steps
@@ -437,6 +473,131 @@ The simulation engine:
 - Resolves actions through layered passes (movement, contact, combat, morale, logistics)
 - Outputs situational text logs based on uncertain, partial information
 - Encourages deductive reasoning, improvisation, and layered strategic planning
+
+🎮 Core Components
+
+Game Engine (ECS)
+
+Located in core/ecs.ts
+Uses Miniplex for Entity Component System
+Manages units, terrain, and game state
+Handles game logic like movement and combat
+
+Command System
+Located in core/parser.ts
+Parses text commands like "Move Alpha to Ridge"
+Converts human text into game actions
+
+State Management
+Located in core/machine.ts
+Uses XState for game state management
+Handles turns, combat resolution, and game flow
+
+UI Layer
+Located in Terminal.tsx
+React-based terminal interface
+Shows game output and accepts commands
+Styled with Tailwind CSS
+
+📝 Data Structure
+
+Units
+Have properties like position, morale, supplies
+Can be friendly or hostile
+Stored in the ECS world
+
+Terrain
+Represents locations like "Ridge Alpha"
+Has connections to other terrain
+Affects combat and movement
+
+Game State
+Tracks current situation
+Manages fog of war
+Handles turn progression
+
+🔄 Basic Flow
+
+- Player types command in Terminal
+- Parser converts text to game action
+- State machine processes the action
+- ECS updates game world
+- Results display in Terminal
+
+All systems properly use the delta time parameter to scale their effects based on elapsed time. This means:
+
+Movement system checks for valid moves (already time-independent)
+
+Combat system:
+Morale damage is now per-second (e.g., 10 damage/sec instead of just 10)
+Ammunition consumption is time-based (1 unit/sec)
+
+Morale system:
+Combat stress is 5 morale loss per second
+Idle recovery is 2 morale gain per second
+
+This makes the simulation more realistic and independent of the tick rate.
+
+Error Handling
+
+New error state with retry/reset options
+Error logging and recovery
+Victory/Defeat Conditions
+
+Three victory conditions: elimination, occupation, survival
+Automatic checks after each turn
+Final states with appropriate messages
+Save/Load System
+
+Save game action with timestamp
+Load game capability
+Persistance of game state
+Turn Management
+
+Turn counter
+Turn-based events and logging
+Time-based game progression
+Enhanced Logging
+
+More detailed system feedback
+Error tracking
+Game state transitions
+The machine now handles:
+
+Game initialization and error recovery
+Command processing and execution
+Continuous game simulation with the tick system
+Victory and defeat conditions
+Save/load functionality
+Turn management
+Comprehensive error handling
+
+Think of it like a text-based chess game, where instead of moving pieces on a board, you're commanding units through text, and the game calculates and describes what happens.
+
+### Test Categories
+
+We'll organize our tests into these categories:
+
+State Machine Tests
+
+State transitions
+Command processing
+Victory/defeat conditions
+Command Parser Tests
+
+Order validation
+Command syntax parsing
+Error handling
+Game World Tests
+
+Unit movement
+Combat resolution
+Terrain effects
+System Tests
+
+Movement system
+Combat system
+Morale system
 
 ### 📌 Existing Examples
 

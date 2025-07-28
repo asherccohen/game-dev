@@ -1,6 +1,6 @@
 import { Order } from './types';
 
-type CommandAction = Order['action'];
+// type CommandAction = Order['action'];
 
 // Helper functions for normalization
 function normalizeLocation(location: string | undefined): string | undefined {
@@ -31,6 +31,7 @@ export function parseCommand(input: string): Order | null {
   // Try each pattern
   for (const [action, pattern] of Object.entries(COMMAND_PATTERNS)) {
     const match = input.match(pattern);
+
     if (match) {
       switch (action) {
         case 'MOVE': {
