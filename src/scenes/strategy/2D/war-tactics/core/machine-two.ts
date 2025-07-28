@@ -179,12 +179,13 @@ export const gameLoopMachine = setup({
 
       logs: ({ context }) => {
         if (context.pendingOrders.length > 0) {
-          return [
+          const newLogs = [
             ...context.logs,
             `Processing ${context.pendingOrders.length} new order(s)`,
           ];
+          return newLogs.slice(-50); // Keep only last 50 entries
         }
-        return context.logs;
+        return context.logs.slice(-50); // Ensure logs are limited even when no orders
       },
     }),
 
@@ -193,38 +194,50 @@ export const gameLoopMachine = setup({
         if (!context.gameWorld) return null;
 
         // Execute all active orders
-        context.activeOrders.forEach((order) => {
-          // Execute order logic here using your ECS actions
-          switch (order.action) {
-            case 'move':
-              // actions.moveUnit(unit, destination);
-              break;
-            case 'attack':
-              // actions.engageTarget(unit, target);
-              break;
-            // Add other order types
-          }
-        });
-
+        if (context.activeOrders.length > 0) {
+          context.activeOrders.forEach((order) => {
+            // Execute order logic here using your ECS actions
+            switch (order.action) {
+              case 'move':
+                // actions.moveUnit(unit, destination);
+                break;
+              case 'attack':
+                // actions.engageTarget(unit, target);
+                break;
+              // Add other order types
+            }
+          });
+        }
         return context.gameWorld;
       },
 
       completedOrders: ({ context }) => {
         // For now, assume all orders complete in one tick
         // In reality, you'd check order status and move only completed ones
-        return [...context.completedOrders, ...context.activeOrders];
+
+        // Add active orders to completed and limit to last 100 entries
+        const newCompletedOrders = [
+          ...context.completedOrders,
+          ...context.activeOrders,
+        ];
+        return newCompletedOrders.slice(-100); // Keep only last 100 completed orders
       },
 
       activeOrders: [],
 
       logs: ({ context }) => {
-        if (context.activeOrders.length > 0) {
-          return [
-            ...context.logs,
-            `Executed ${context.activeOrders.length} order(s)`,
-          ];
-        }
-        return context.logs;
+        // if (context.activeOrders.length > 0) {
+        //   return [
+        //     ...context.logs,
+        //     `Executed ${context.activeOrders.length} order(s)`,
+        //   ];
+        // }
+        // return context.logs.slice(-50); // Already limited, but keeping for consistency
+        const newLogs = [
+          ...context.logs,
+          `Executed ${context.activeOrders.length} order(s)`,
+        ];
+        return newLogs.slice(-50); // Ensure logs are also limited
       },
     }),
 
@@ -257,10 +270,13 @@ export const gameLoopMachine = setup({
         return newLogs.slice(-10); // Keep last 10 sitreps
       },
 
-      logs: ({ context }) => [
-        ...context.logs,
-        `Generated SITREP for tick ${context.currentTick}`,
-      ],
+      logs: ({ context }) => {
+        const newLogs = [
+          ...context.logs,
+          `Generated SITREP for tick ${context.currentTick}`,
+        ];
+        return newLogs.slice(-50); // 🔥 ADD THIS
+      },
     }),
 
     addOrder: assign({
@@ -273,48 +289,62 @@ export const gameLoopMachine = setup({
 
       logs: ({ context, event }) => {
         if (event.type === 'SUBMIT_ORDER') {
-          return [
+          const newLogs = [
             ...context.logs,
             `Order received: ${event.order.action} for ${event.order.unit}`,
           ];
+          return newLogs.slice(-50); // 🔥 ADD THIS
         }
-        return context.logs;
+        return context.logs.slice(-50); // 🔥 ADD THIS
       },
     }),
 
     advanceTurn: assign({
       turnCount: ({ context }) => context.turnCount + 1,
-      logs: ({ context }) => [
-        ...context.logs,
-        `--- TURN ${context.turnCount + 1} BEGINS ---`,
-      ],
+      logs: ({ context }) => {
+        const newLogs = [
+          ...context.logs,
+          `--- TURN ${context.turnCount + 1} BEGINS ---`,
+        ];
+        return newLogs.slice(-50); // Keep only last 50 entries
+      },
     }),
 
     setRealTimeMode: assign({
       isRealTime: ({ event }) =>
         event.type === 'SET_REAL_TIME' ? event.enabled : true,
-      logs: ({ context, event }) => [
-        ...context.logs,
-        `Game mode: ${event.type === 'SET_REAL_TIME' && event.enabled ? 'Real-time' : 'Turn-based'}`,
-      ],
+      logs: ({ context, event }) => {
+        const newLogs = [
+          ...context.logs,
+          `Game mode: ${event.type === 'SET_REAL_TIME' && event.enabled ? 'Real-time' : 'Turn-based'}`,
+        ];
+
+        return newLogs.slice(-50);
+      },
     }),
 
     setTickSpeed: assign({
       tickDuration: ({ event }) =>
         event.type === 'CHANGE_TICK_SPEED' ? event.duration : 5000,
-      logs: ({ context, event }) => [
-        ...context.logs,
-        `Tick speed changed to ${event.type === 'CHANGE_TICK_SPEED' ? event.duration : 5000}ms`,
-      ],
+      logs: ({ context, event }) => {
+        const newLogs = [
+          ...context.logs,
+          `Tick speed changed to ${event.type === 'CHANGE_TICK_SPEED' ? event.duration : 5000}ms`,
+        ];
+        return newLogs.slice(-50); // Keep only last 50 entries
+      },
     }),
 
     handleError: assign({
       error: ({ event }) =>
         event.type === 'ERROR' ? event.error : 'Unknown error',
-      logs: ({ context, event }) => [
-        ...context.logs,
-        `ERROR: ${event.type === 'ERROR' ? event.error : 'Unknown error'}`,
-      ],
+      logs: ({ context, event }) => {
+        const newLogs = [
+          ...context.logs,
+          `ERROR: ${event.type === 'ERROR' ? event.error : 'Unknown error'}`,
+        ];
+        return newLogs.slice(-50);
+      },
     }),
 
     resetGame: assign({
@@ -380,7 +410,10 @@ export const gameLoopMachine = setup({
         1000: {
           target: 'running',
           actions: assign({
-            logs: ({ context }) => [...context.logs, 'Game started'],
+            logs: ({ context }) => {
+              const newLogs = [...context.logs, 'Game started'];
+              return newLogs.slice(-50); // Keep only last 50 entries
+            },
           }),
         },
       },
@@ -419,17 +452,23 @@ export const gameLoopMachine = setup({
         MISSION_COMPLETE: {
           target: 'victory',
           actions: assign({
-            logs: ({ context }) => [
-              ...context.logs,
-              'Mission completed successfully!',
-            ],
+            logs: ({ context }) => {
+              const newLogs = [
+                ...context.logs,
+                'Mission completed successfully!',
+              ];
+              return newLogs.slice(-50); // Keep only last 50 entries
+            },
           }),
         },
 
         MISSION_FAILED: {
           target: 'defeat',
           actions: assign({
-            logs: ({ context }) => [...context.logs, 'Mission failed!'],
+            logs: ({ context }) => {
+              const newLogs = [...context.logs, 'Mission failed!'];
+              return newLogs.slice(-50); // Keep only last 50 entries
+            },
           }),
         },
 
@@ -451,7 +490,10 @@ export const gameLoopMachine = setup({
       states: {
         turnBased: {
           entry: assign({
-            logs: ({ context }) => [...context.logs, 'Turn-based mode active'],
+            logs: ({ context }) => {
+              const newLogs = [...context.logs, 'Turn-based mode active'];
+              return newLogs.slice(-50); // Keep only last 50 entries
+            },
           }),
 
           on: {
@@ -466,7 +508,10 @@ export const gameLoopMachine = setup({
 
         realTime: {
           entry: assign({
-            logs: ({ context }) => [...context.logs, 'Real-time mode active'],
+            logs: ({ context }) => {
+              const newLogs = [...context.logs, 'Real-time mode active'];
+              return newLogs.slice(-50); // Keep only last 50 entries
+            },
           }),
 
           invoke: {
@@ -512,14 +557,20 @@ export const gameLoopMachine = setup({
 
     paused: {
       entry: assign({
-        logs: ({ context }) => [...context.logs, 'Game paused'],
+        logs: ({ context }) => {
+          const newLogs = [...context.logs, 'Game paused'];
+          return newLogs.slice(-50); // Keep only last 50 entries
+        },
       }),
 
       on: {
         RESUME_GAME: {
           target: 'running',
           actions: assign({
-            logs: ({ context }) => [...context.logs, 'Game resumed'],
+            logs: ({ context }) => {
+              const newLogs = [...context.logs, 'Game resumed'];
+              return newLogs.slice(-50); // Keep only last 50 entries
+            },
           }),
         },
 
@@ -528,10 +579,13 @@ export const gameLoopMachine = setup({
           actions: [
             'addOrder',
             assign({
-              logs: ({ context }) => [
-                ...context.logs,
-                'Order queued while game is paused',
-              ],
+              logs: ({ context }) => {
+                const newLogs = [
+                  ...context.logs,
+                  'Order queued while game is paused',
+                ];
+                return newLogs.slice(-50); // Keep only last 50 entries
+              },
             }),
           ],
         },
@@ -546,31 +600,40 @@ export const gameLoopMachine = setup({
     victory: {
       type: 'final',
       entry: assign({
-        logs: ({ context }) => [
-          ...context.logs,
-          '🎉 MISSION ACCOMPLISHED! Victory achieved.',
-          `Final stats: ${context.turnCount} turns, ${context.currentTick} ticks`,
-        ],
+        logs: ({ context }) => {
+          const newLogs = [
+            ...context.logs,
+            '🎉 MISSION ACCOMPLISHED! Victory achieved.',
+            `Final stats: ${context.turnCount} turns, ${context.currentTick} ticks`,
+          ];
+          return newLogs.slice(-50); // Keep only last 50 entries
+        },
       }),
     },
 
     defeat: {
       type: 'final',
       entry: assign({
-        logs: ({ context }) => [
-          ...context.logs,
-          '❌ MISSION FAILED! Defeat conditions met.',
-          `Final stats: ${context.turnCount} turns, ${context.currentTick} ticks`,
-        ],
+        logs: ({ context }) => {
+          const newLogs = [
+            ...context.logs,
+            '❌ MISSION FAILED! Defeat conditions met.',
+            `Final stats: ${context.turnCount} turns, ${context.currentTick} ticks`,
+          ];
+          return newLogs.slice(-50); // Keep only last 50 entries
+        },
       }),
     },
 
     error: {
       entry: assign({
-        logs: ({ context }) => [
-          ...context.logs,
-          `Game encountered an error: ${context.error}`,
-        ],
+        logs: ({ context }) => {
+          const newLogs = [
+            ...context.logs,
+            `Game encountered an error: ${context.error}`,
+          ];
+          return newLogs.slice(-50); // Keep only last 50 entries
+        },
       }),
 
       on: {

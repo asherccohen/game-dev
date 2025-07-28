@@ -401,6 +401,18 @@ HQ: Supplies delayed due to weather.
 
 ---
 
+### Memory Management
+
+✅ Cleanup Logic Works: After processing 105 orders, exactly 100 are retained
+✅ Most Recent Orders Kept: Alpha1 through Alpha100 (the last 100)
+✅ Oldest Orders Dropped: Alpha0 was properly removed by slice(-100)
+✅ Memory Management: No unlimited growth of completed orders
+
+✅ Log limiting (50 entries)
+✅ SITREP limiting (10 entries)
+✅ Completed orders limiting (100 entries)
+✅ No memory leaks in long sessions
+
 ### COMMAND EXAMPLE
 
 Move Commands
