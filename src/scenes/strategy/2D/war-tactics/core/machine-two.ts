@@ -153,12 +153,16 @@ export const gameLoopMachine = setup({
         event.type === 'TICK' ? event.timestamp : Date.now(),
 
       logs: ({ context, event }) => {
-        const tickInfo =
-          event.type === 'TICK'
-            ? `[TICK ${context.currentTick + 1}] Mission time: ${Math.floor(((context.missionTimer + 1) * context.tickDuration) / 1000)}s`
-            : `[TICK ${context.currentTick + 1}] Manual advance`;
+        let tickInfo: string | undefined = undefined;
+        if (event.type === 'TICK') {
+          tickInfo = `[TICK ${context.currentTick + 1}] Mission time: ${Math.floor(((context.missionTimer + 1) * context.tickDuration) / 1000)}s`;
+        }
+        if (event.type === 'ADVANCE_TICK') {
+          tickInfo = `[TICK ${context.currentTick + 1}] Manual advance`;
+        }
 
-        return [...context.logs.slice(-50), tickInfo]; // Keep last 50 logs
+        const newLogs = [...context.logs, ...(tickInfo ? [tickInfo] : [])];
+        return newLogs.slice(-50); // Keep only last 50 entries
       },
     }),
 
@@ -248,7 +252,9 @@ export const gameLoopMachine = setup({
         const timestamp = new Date().toLocaleTimeString();
         const newSitrep = `[${timestamp}] SITREP: All units operational. No contact.`;
 
-        return [...context.sitreps.slice(-10), newSitrep]; // Keep last 10 sitreps
+        const newLogs = [...context.sitreps, newSitrep];
+
+        return newLogs.slice(-10); // Keep last 10 sitreps
       },
 
       logs: ({ context }) => [
@@ -361,6 +367,10 @@ export const gameLoopMachine = setup({
         },
         RESET_GAME: {
           actions: 'resetGame',
+        },
+        ERROR: {
+          target: 'error',
+          actions: 'handleError',
         },
       },
     },

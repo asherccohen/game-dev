@@ -278,7 +278,54 @@ describe('GameLoopMachine', () => {
     });
   });
 
-  describe.only('Tick Processing Pipeline', () => {
+  // describe.only('Tick Processing Pipeline', () => {
+  //   beforeEach(async () => {
+  //     actor = createTestActor();
+  //     actor.start();
+  //     actor.send({ type: 'START_GAME' });
+  //     vi.advanceTimersByTime(1000);
+  //   });
+
+  //   it('should execute all tick processing actions in correct order', () => {
+  //     actor.send({ type: 'ADVANCE_TICK' });
+  //     vi.advanceTimersByTime(100);
+
+  //     const context = actor.getSnapshot().context;
+
+  //     // Check that tick was incremented
+  //     expect(context.currentTick).toBe(1);
+  //     expect(context.missionTimer).toBe(1);
+
+  //     // Check that SITREP was generated
+  //     expect(context.sitreps).toHaveLength(1);
+  //     expect(context.sitreps[0]).toContain('SITREP: All units operational');
+
+  //     // Check that logs were updated appropriately
+  //     expect(context.logs).toContain('Generated SITREP for tick 1');
+  //   });
+
+  //   it.only('should update mission timer correctly', () => {
+  //     const initialTick = actor.getSnapshot().context.currentTick;
+  //     const initialMissionTimer = actor.getSnapshot().context.missionTimer;
+
+  //     actor.send({ type: 'ADVANCE_TICK' });
+  //     vi.advanceTimersByTime(100);
+
+  //     const newContext = actor.getSnapshot().context;
+
+  //     // Test the actual state changes
+  //     expect(newContext.currentTick).toBe(initialTick + 1);
+  //     expect(newContext.missionTimer).toBe(initialMissionTimer + 1);
+  //     expect(newContext.lastTickTime).toBeGreaterThan(0);
+
+  //     // Test that tick processing happened
+  //     expect(newContext.logs.length).toBeGreaterThan(initialTick);
+  //   });
+  // });
+
+  // ...existing code...
+
+  describe('Tick Processing Pipeline', () => {
     beforeEach(async () => {
       actor = createTestActor();
       actor.start();
@@ -286,41 +333,206 @@ describe('GameLoopMachine', () => {
       vi.advanceTimersByTime(1000);
     });
 
-    it('should execute all tick processing actions in correct order', () => {
-      actor.send({ type: 'ADVANCE_TICK' });
-      vi.advanceTimersByTime(100);
+    describe('Manual Tick Processing (ADVANCE_TICK)', () => {
+      it('should execute all tick processing actions in correct order for manual advance', () => {
+        actor.send({ type: 'ADVANCE_TICK' });
+        vi.advanceTimersByTime(100);
 
-      const context = actor.getSnapshot().context;
+        const context = actor.getSnapshot().context;
 
-      // Check that tick was incremented
-      expect(context.currentTick).toBe(1);
-      expect(context.missionTimer).toBe(1);
+        // Check that tick was incremented
+        expect(context.currentTick).toBe(1);
+        expect(context.missionTimer).toBe(1);
 
-      // Check that SITREP was generated
-      expect(context.sitreps).toHaveLength(1);
-      expect(context.sitreps[0]).toContain('SITREP: All units operational');
+        // Check that SITREP was generated
+        expect(context.sitreps).toHaveLength(1);
+        expect(context.sitreps[0]).toContain('SITREP: All units operational');
 
-      // Check that logs were updated appropriately
-      expect(context.logs).toContain('Generated SITREP for tick 1');
+        // Check that logs were updated appropriately
+        expect(context.logs).toContain('Generated SITREP for tick 1');
+        expect(context.logs).toContain('[TICK 1] Manual advance');
+      });
+
+      it('should update mission timer correctly for manual advance', () => {
+        const initialTick = actor.getSnapshot().context.currentTick;
+        const initialMissionTimer = actor.getSnapshot().context.missionTimer;
+
+        actor.send({ type: 'ADVANCE_TICK' });
+        vi.advanceTimersByTime(100);
+
+        const newContext = actor.getSnapshot().context;
+
+        // Test the actual state changes
+        expect(newContext.currentTick).toBe(initialTick + 1);
+        expect(newContext.missionTimer).toBe(initialMissionTimer + 1);
+        expect(newContext.lastTickTime).toBeGreaterThan(0);
+
+        // Test that manual advance log exists
+        expect(newContext.logs).toContain(
+          `[TICK ${newContext.currentTick}] Manual advance`,
+        );
+      });
+
+      it('should process pending orders during manual tick', () => {
+        const order: Order = {
+          unit: 'Alpha',
+          action: 'move',
+          destination: 'Point A',
+          modifiers: [],
+        };
+
+        actor.send({ type: 'SUBMIT_ORDER', order });
+        expect(actor.getSnapshot().context.pendingOrders).toHaveLength(1);
+
+        actor.send({ type: 'ADVANCE_TICK' });
+        vi.advanceTimersByTime(100);
+
+        const context = actor.getSnapshot().context;
+        expect(context.pendingOrders).toHaveLength(0);
+        expect(context.completedOrders).toHaveLength(1);
+        expect(context.logs).toContain('Processing 1 new order(s)');
+        expect(context.logs).toContain('Executed 1 order(s)');
+      });
     });
 
-    it.only('should update mission timer correctly', () => {
-      const context = actor.getSnapshot().context;
-      const initialTime = context.missionTimer;
-      const tickDuration = context.tickDuration;
+    describe('Automatic Tick Processing (TICK)', () => {
+      beforeEach(() => {
+        // Switch to real-time mode for automatic ticking
+        actor.send({ type: 'SET_REAL_TIME', enabled: true });
+        vi.advanceTimersByTime(100); // Allow state transition
+      });
 
-      actor.send({ type: 'ADVANCE_TICK' });
-      vi.advanceTimersByTime(100);
+      it('should execute all tick processing actions in correct order for automatic tick', () => {
+        // Simulate a TICK event from the timer
+        actor.send({ type: 'TICK', timestamp: Date.now() });
+        vi.advanceTimersByTime(100);
 
-      const newContext = actor.getSnapshot().context;
-      const expectedMissionTime = Math.floor(
-        ((initialTime + 1) * tickDuration) / 1000,
-      );
+        const context = actor.getSnapshot().context;
 
-      console.log('🚀 ~ actor:', actor.getSnapshot().context);
-      expect(newContext.logs).toContain(
-        `[TICK 1] Mission time: ${expectedMissionTime}s`,
-      );
+        // Check that tick was incremented
+        expect(context.currentTick).toBe(1);
+        expect(context.missionTimer).toBe(1);
+
+        // Check that SITREP was generated
+        expect(context.sitreps).toHaveLength(1);
+        expect(context.sitreps[0]).toContain('SITREP: All units operational');
+
+        // Check that logs were updated appropriately
+        expect(context.logs).toContain('Generated SITREP for tick 1');
+
+        // Check for mission time log (automatic tick should show mission time)
+        const expectedMissionTime = Math.floor(
+          (1 * context.tickDuration) / 1000,
+        );
+        expect(context.logs).toContain(
+          `[TICK 1] Mission time: ${expectedMissionTime}s`,
+        );
+      });
+
+      it('should update mission timer correctly for automatic tick', () => {
+        const initialTick = actor.getSnapshot().context.currentTick;
+        const initialMissionTimer = actor.getSnapshot().context.missionTimer;
+        const tickDuration = actor.getSnapshot().context.tickDuration;
+
+        const timestamp = Date.now();
+        actor.send({ type: 'TICK', timestamp });
+        vi.advanceTimersByTime(100);
+
+        const newContext = actor.getSnapshot().context;
+
+        // Test the actual state changes
+        expect(newContext.currentTick).toBe(initialTick + 1);
+        expect(newContext.missionTimer).toBe(initialMissionTimer + 1);
+        expect(newContext.lastTickTime).toBe(timestamp);
+
+        // Test that mission time log exists
+        const expectedMissionTime = Math.floor(
+          (newContext.missionTimer * tickDuration) / 1000,
+        );
+        expect(newContext.logs).toContain(
+          `[TICK ${newContext.currentTick}] Mission time: ${expectedMissionTime}s`,
+        );
+      });
+
+      it('should process pending orders during automatic tick', () => {
+        const order: Order = {
+          unit: 'Bravo',
+          action: 'attack',
+          target: 'Enemy 1',
+          modifiers: [],
+        };
+
+        actor.send({ type: 'SUBMIT_ORDER', order });
+        expect(actor.getSnapshot().context.pendingOrders).toHaveLength(1);
+
+        actor.send({ type: 'TICK', timestamp: Date.now() });
+        vi.advanceTimersByTime(100);
+
+        const context = actor.getSnapshot().context;
+        expect(context.pendingOrders).toHaveLength(0);
+        expect(context.completedOrders).toHaveLength(1);
+        expect(context.logs).toContain('Processing 1 new order(s)');
+        expect(context.logs).toContain('Executed 1 order(s)');
+      });
+
+      it('should handle continuous automatic ticking', () => {
+        // Send multiple TICK events to simulate continuous real-time progression
+        const timestamps = [Date.now(), Date.now() + 1000, Date.now() + 2000];
+
+        timestamps.forEach((timestamp, index) => {
+          actor.send({ type: 'TICK', timestamp });
+          vi.advanceTimersByTime(100);
+
+          const context = actor.getSnapshot().context;
+          expect(context.currentTick).toBe(index + 1);
+          expect(context.missionTimer).toBe(index + 1);
+          expect(context.lastTickTime).toBe(timestamp);
+        });
+
+        const finalContext = actor.getSnapshot().context;
+        expect(finalContext.currentTick).toBe(3);
+        expect(finalContext.missionTimer).toBe(3);
+      });
+    });
+
+    describe('Tick Processing Comparison', () => {
+      it('should increment counters identically for both tick types', () => {
+        // Test manual tick
+        const actor1 = createTestActor();
+        actor1.start();
+        actor1.send({ type: 'START_GAME' });
+        vi.advanceTimersByTime(1000);
+
+        actor1.send({ type: 'ADVANCE_TICK' });
+        vi.advanceTimersByTime(100);
+
+        const manualContext = actor1.getSnapshot().context;
+
+        // Test automatic tick
+        const actor2 = createTestActor();
+        actor2.start();
+        actor2.send({ type: 'START_GAME' });
+        vi.advanceTimersByTime(1000);
+        actor2.send({ type: 'SET_REAL_TIME', enabled: true });
+        vi.advanceTimersByTime(100);
+
+        actor2.send({ type: 'TICK', timestamp: Date.now() });
+        vi.advanceTimersByTime(100);
+
+        const autoContext = actor2.getSnapshot().context;
+
+        // Both should have same tick and mission timer values
+        expect(manualContext.currentTick).toBe(autoContext.currentTick);
+        expect(manualContext.missionTimer).toBe(autoContext.missionTimer);
+
+        // But different log messages
+        expect(
+          manualContext.logs.some((log) => log.includes('Manual advance')),
+        ).toBe(true);
+        expect(
+          autoContext.logs.some((log) => log.includes('Mission time:')),
+        ).toBe(true);
+      });
     });
   });
 
@@ -445,7 +657,18 @@ describe('GameLoopMachine', () => {
       actor.start();
     });
 
+    it('should handle errors in idle', () => {
+      actor.send({ type: 'ERROR', error: 'Initialization failed' });
+
+      expect(actor.getSnapshot().value).toBe('error');
+      expect(actor.getSnapshot().context.error).toBe('Initialization failed');
+      expect(actor.getSnapshot().context.logs).toContain(
+        'ERROR: Initialization failed',
+      );
+    });
+
     it('should handle errors during initialization', () => {
+      actor.send({ type: 'START_GAME' });
       actor.send({ type: 'ERROR', error: 'Initialization failed' });
 
       expect(actor.getSnapshot().value).toBe('error');
