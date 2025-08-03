@@ -220,3 +220,233 @@ All player feedback is via text:
 * *Door Kickers 2*
 
 All have partial overlaps, but none hit the mark of TTW: deep tactical decision-making via command interface with no visual layer.
+
+I’ll walk you through how the game logic flows from command to outcome, and then outline what influences the simulation at each stage.
+
+
+---
+
+🔄 Command-to-Outcome Pipeline (Game Tick Lifecycle)
+
+Let’s break down what happens when a player issues a command and how the engine turns that into game state + output.
+
+1. Command Issued
+
+Player sends something like:
+
+> Move Alpha to Ridge-3 before dawn under radio silence
+
+2. Parsing + Intent Extraction
+
+Command is parsed into a structured directive:
+
+{
+  unit: "Alpha",
+  action: "move",
+  destination: "Ridge-3",
+  time_constraint: "before 0600Z",
+  modifiers: ["stealth"]
+}
+
+This parsing phase involves:
+
+Tokenization (semantic segmentation)
+
+Entity extraction (units, objectives, time)
+
+Intent classification (move, attack, hold, etc.)
+
+Modifier interpretation (e.g., "radio silence" implies comms delay)
+
+
+
+---
+
+3. Action Queueing / Scheduling
+
+Parsed directive is added to a tick-based scheduler.
+
+tickEngine.queueAction({
+  unitId: "Alpha",
+  action: "move",
+  targetZone: "Ridge-3",
+  startTick: currentTick,
+  conditions: ["radio_silence"],
+  deadline: tickBefore(0600Z),
+});
+
+
+---
+
+4. Tick Processing Loop
+
+Each game tick (e.g., every 5 min simulated), the engine runs:
+
+a. Prep Phase
+
+Units start executing commands (e.g., Alpha begins moving)
+
+Delay modifiers (e.g., stealth = slower)
+
+Logistics check (e.g., enough fuel, no blocked roads)
+
+Signal jamming may garble or delay commands
+
+
+b. Contact Detection
+
+Based on proximity, recon, or sound, opposing units may become aware of each other
+
+Random rolls + modifiers determine whether contact occurs this tick
+
+
+c. Combat Phase
+
+If contact:
+
+Calculate surprise/initiative (who saw whom first)
+
+Check terrain bonuses
+
+Resolve combat round(s)
+
+
+Example:
+
+resolveCombat({
+  attacker: "Alpha",
+  defender: "Foxtrot",
+  terrain: "Ridge",
+  modifiers: ["stealth", "high_ground"],
+});
+
+d. Morale + Behavior Checks
+
+Is unit low on ammo?
+
+Are they pinned or flanked?
+
+What’s their morale and personality trait?
+
+Trigger possible refusal to follow next command or initiate retreat
+
+
+e. Logistics Phase
+
+Ammo, supplies, medical evac
+
+Resupply progress if initiated in previous ticks
+
+Communications: were new orders received?
+
+
+
+---
+
+5. Simulation State Update
+
+World state is updated:
+
+Zones are marked with presence or conflict
+
+Unit positions adjusted
+
+Morale/fatigue values updated
+
+
+
+---
+
+6. Generate Output
+
+Player receives:
+
+[0545Z] ALPHA reached Ridge-3 under cover of darkness. No enemy contact.
+[0550Z] FOXTROT reports spotting movement east. Possible UAV pinged.
+
+Generated using a templated message system that factors:
+
+Outcome
+
+Confidence (was the info partial or intercepted?)
+
+Style (based on player preferences or mission tone)
+
+
+
+---
+
+🧠 Key Factors that Influence the Simulation
+
+Here are the primary inputs to the simulation engine each tick:
+
+🎯 Command Factors
+
+Action type: move, recon, engage, extract
+
+Modifiers: stealth, speed, delay, deception
+
+Constraints: time, conditions, dependencies
+
+
+🪖 Unit Traits
+
+Morale, fatigue, experience
+
+Loadout (weapons, gear)
+
+Commander behavior (aggressive, cautious, defiant)
+
+
+🌍 World State
+
+Zone traits (e.g., "Ridge-3" = high ground, low visibility)
+
+Time of day (e.g., "before dawn" = lower visibility)
+
+Weather (rain = reduced mobility and recon)
+
+Fog of war / jamming zones
+
+
+🔫 Opponent Behavior
+
+Enemy AI may:
+
+Patrol
+
+Ambush
+
+Delay movement
+
+Fall back
+
+
+Your actions influence theirs (especially in PvP or adaptive AI)
+
+
+
+---
+
+🧱 Summary: Data Flow from Command to Result
+
+Command (Text/NL)
+   ↓
+Parse → Structured Intent
+   ↓
+Queue Action in Tick Scheduler
+   ↓
+Game Tick Runs
+   ↓
+→ Prep → Contact → Combat → Morale → Logistics
+   ↓
+Update Unit & World State
+   ↓
+Output: Logs, Reports, Alerts
+
+
+---
+
+Let me know if you want this formalized into actual code architecture (e.g., XState logic, ECS layout with miniplex), or if you want to prototype a specific action simulation loop.
+
+
