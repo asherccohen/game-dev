@@ -4,7 +4,7 @@ import {
   createGameLoopMachine,
   GameLoopContext,
   gameLoopMachine,
-} from './machine-two';
+} from './machine-game-loop';
 import { Order } from './types';
 
 // Mock the ECS module

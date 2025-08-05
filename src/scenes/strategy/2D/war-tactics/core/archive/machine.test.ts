@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { createActor } from 'xstate';
-import { createBasicCombatScenario } from '../tests/scenarios/basic-combat';
 import { GameContext, gameMachine } from './machine';
+import { createBasicCombatScenario } from './tests/scenarios/basic-combat';
 
 const createTestActor = (overrides: Partial<GameContext> = {}) => {
   return createActor(gameMachine, {

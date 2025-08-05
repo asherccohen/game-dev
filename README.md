@@ -245,6 +245,7 @@ _-_-
 - Side-Scrolling Adventures
 - Puzzle Games
 - Roguelikes
+- Strategic single and multiplayer
 
 ### 2.5D Genres
 

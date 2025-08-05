@@ -1,4 +1,4 @@
-import { createGameWorld } from '../../core/ecs';
+import { createGameWorld } from '../../../ecs';
 
 export const createBasicCombatScenario = () => {
   const { world, factories, systems } = createGameWorld();

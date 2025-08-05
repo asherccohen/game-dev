@@ -6,8 +6,8 @@ import {
   raise,
   setup,
 } from 'xstate';
-import { actions, createGameWorld, GameWorld, TerrainNode, Unit } from './ecs';
-import { GameState, Order } from './types';
+import { actions, createGameWorld, GameWorld, TerrainNode, Unit } from '../ecs';
+import { GameState, Order } from '../types';
 
 // Input type for the machine
 export interface GameInput {

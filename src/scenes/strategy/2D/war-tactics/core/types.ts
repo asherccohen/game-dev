@@ -1,4 +1,5 @@
 import { World } from 'miniplex';
+import { GameWorld } from './ecs';
 
 export type UnitType =
   | 'Infantry'
@@ -46,4 +47,36 @@ export interface GameState {
   weather: string;
   visibility: 'clear' | 'limited' | 'poor';
   communications: 'normal' | 'disrupted' | 'jammed';
+}
+
+export interface GameContext {
+  // World state
+  gameWorld: GameWorld | null;
+  gameState: GameState | null;
+
+  // Time management
+  currentTick: number;
+  tickDuration: number; // milliseconds per tick (e.g., 5000 = 5 seconds)
+  lastTickTime: number;
+  isRealTime: boolean; // true for real-time, false for turn-based
+
+  // Game progression
+  turnCount: number;
+  missionTimer: number; // total mission time in ticks
+
+  // Orders and state
+  pendingOrders: Order[];
+  activeOrders: Order[];
+  completedOrders: Order[];
+
+  // Logs and reports
+  logs: string[];
+  sitreps: string[];
+
+  // Victory conditions
+  victoryCondition: 'elimination' | 'occupation' | 'survival' | 'time_limit';
+  missionTimeLimit?: number | undefined; // in ticks
+
+  // Error handling
+  error: string | null;
 }

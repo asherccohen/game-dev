@@ -1,39 +1,9 @@
 import { assign, EventObject, fromCallback, setup } from 'xstate';
-import { createGameWorld, GameWorld } from './ecs';
-import { GameState, Order } from './types';
+import { createGameWorld } from './ecs';
+import { GameContext, Order } from './types';
 
 // Core game loop context
-export interface GameLoopContext {
-  // World state
-  gameWorld: GameWorld | null;
-  gameState: GameState | null;
-
-  // Time management
-  currentTick: number;
-  tickDuration: number; // milliseconds per tick (e.g., 5000 = 5 seconds)
-  lastTickTime: number;
-  isRealTime: boolean; // true for real-time, false for turn-based
-
-  // Game progression
-  turnCount: number;
-  missionTimer: number; // total mission time in ticks
-
-  // Orders and state
-  pendingOrders: Order[];
-  activeOrders: Order[];
-  completedOrders: Order[];
-
-  // Logs and reports
-  logs: string[];
-  sitreps: string[];
-
-  // Victory conditions
-  victoryCondition: 'elimination' | 'occupation' | 'survival' | 'time_limit';
-  missionTimeLimit?: number | undefined; // in ticks
-
-  // Error handling
-  error: string | null;
-}
+export interface GameLoopContext extends GameContext {}
 
 // Tick event with timing data
 interface TickEvent extends EventObject {

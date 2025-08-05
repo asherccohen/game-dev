@@ -204,6 +204,59 @@ Each round gives:
 - Situational surprises (ambush, weather, unit panic)
 - Logistics/supply strain (limited radio, ammo, fuel)
 
+Looking at your test file, I can see your machine processes orders every 100ms when using `ADVANCE_TICK` or `TICK` events. Whether this is "ok" depends on your game's requirements:
+
+## 🎮 **100ms is Generally Fine For:**
+
+- **Turn-based strategy games** (like your war tactics game)
+- **Real-time strategy** with moderate pace
+- **Simulation games**
+- **Most multiplayer games** (under typical network latency)
+
+## ⚡ **When 100ms Might Be Too Slow:**
+
+- **Fast-paced action games** (FPS, racing, fighting games need 16-33ms)
+- **Real-time competitive games** requiring frame-perfect timing
+- **Games with precise physics simulation**
+
+## 🎯 **For Your War Tactics Game:**
+
+100ms (10 ticks per second) is **perfectly appropriate** because:
+
+1. **Strategic Decision Making**: Players need time to think, not react instantly
+2. **Order Processing**: Military commands don't need split-second execution
+3. **Network Tolerance**: Allows for network latency in multiplayer
+4. **Resource Efficiency**: Less CPU/battery usage than 60fps game loops
+
+## 🔧 **Your Current Implementation is Smart:**
+
+```typescript
+// Your machine allows configurable tick duration
+tickDuration: 5000,  // Default 5 seconds for turn-based
+// But can be set to 100ms for real-time mode
+
+// And you handle both modes:
+CHANGE_TICK_SPEED: { actions: 'setTickSpeed' }
+```
+
+## 📊 **Common Game Loop Frequencies:**
+
+| Game Type         | Frequency               | Use Case              |
+| ----------------- | ----------------------- | --------------------- |
+| 16ms (60fps)      | Action/FPS              | Frame-perfect timing  |
+| 33ms (30fps)      | Real-time strategy      | Smooth visual updates |
+| **100ms (10fps)** | **Turn-based strategy** | **Your use case ✅**  |
+| 1000ms (1fps)     | Slow simulation         | Chess, board games    |
+
+## 💡 **Recommendations:**
+
+1. **Keep 100ms for order processing** - it's appropriate for your game type
+2. **Consider separate render loop** - UI updates can be 60fps while game logic runs at 10fps
+3. **Make it configurable** - let players adjust if they want faster/slower pace
+4. **Batch operations** - process multiple orders per tick for efficiency
+
+Your 100ms game loop is well-suited for a tactical strategy game! 🎯
+
 ---
 
 ## 📘 Example Turn
@@ -447,6 +500,147 @@ retreat Alpha Squad
 retreat Bravo Squad to Ridge Point
 retreat Charlie Squad to Valley Beta when under heavy fire
 retreat Delta Squad when morale low
+```
+
+## War Tactics Command Grammar
+
+### Command Syntax Patterns
+
+The war tactics game uses a **natural language parser** (`core/parser.ts`) that converts military commands into structured game actions. All commands follow strict regex patterns for consistency.
+
+### Movement Commands
+
+```bash
+# Basic movement
+move [Unit] to [Location]
+move Alpha Squad to Ridge Point
+move Bravo to Valley Beta
+
+# Time-constrained movement
+move [Unit] to [Location] before [Time]
+move Charlie Squad to Forest Edge before 1200Z
+move Delta Squad to High Ground before 1500Z
+
+# Movement with modifiers
+move [Unit] to [Location] under [Modifiers]
+move Alpha Squad to Ridge Point under radio silence
+move Bravo Squad to Valley Beta under smoke cover and radio silence
+
+# Combined constraints
+move [Unit] to [Location] before [Time] under [Modifiers]
+move Delta Squad to High Ground before 1500Z under smoke cover and radio silence
+```
+
+**Regex Pattern**: `/^move\s+([A-Za-z]+(?:\s+Squad)?)\s+to\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)(?:\s+before\s+(\d{4}Z))?(?:\s+under\s+(.+))?$/i`
+
+### Attack Commands
+
+```bash
+# Basic attack
+attack [Target] with [Unit]
+attack Enemy Squad with Alpha Squad
+attack Hostile Unit with Bravo Squad
+
+# Attack with tactics
+attack [Target] with [Unit] using [Tactics]
+attack Enemy Position with Charlie Squad using flanking maneuver
+attack Hostile Unit with Bravo Squad using suppressing fire
+attack Enemy Position with Charlie Squad using flanking maneuver and artillery support
+```
+
+**Regex Pattern**: `/^attack\s+([A-Za-z]+(?:\s+Squad)?)\s+with\s+([A-Za-z]+(?:\s+Squad)?)(?:\s+using\s+(.+))?$/i`
+
+### Defend Commands
+
+```bash
+# Positional defense
+defend [Location] with [Unit]
+defend Ridge Point with Alpha Squad
+defend Valley Beta with Bravo Squad
+defend Forest Edge with Charlie Squad
+```
+
+**Regex Pattern**: `/^defend\s+([A-Za-z]+(?:\s+[A-Za-z]+)?)\s+with\s+([A-Za-z]+(?:\s+Squad)?)$/i`
+
+### Retreat Commands
+
+```bash
+# Simple retreat
+retreat [Unit]
+retreat Alpha Squad
+
+# Retreat to location
+retreat [Unit] to [Location]
+retreat Bravo Squad to Ridge Point
+retreat Charlie Squad to Valley Beta
+
+# Conditional retreat
+retreat [Unit] when [Condition]
+retreat Delta Squad when morale low
+retreat Charlie Squad to Valley Beta when under heavy fire
+```
+
+**Regex Pattern**: `/^retreat\s+([A-Za-z]+(?:\s+Squad)?)(?:\s+to\s+([A-Za-z]+(?:\s+[A-Za-z]+)?))?(?:\s+when\s+(.+))?$/i`
+
+### Command Processing Pipeline
+
+1. **Input Normalization**: Trim whitespace, case-insensitive matching
+2. **Pattern Matching**: Try each regex pattern in sequence (MOVE → ATTACK → DEFEND → RETREAT)
+3. **Data Extraction**: Extract unit names, locations, time constraints, modifiers
+4. **Field Normalization**:
+   - Locations: lowercase with spaces → hyphens (`Ridge Point` → `ridge-point`)
+   - Units: preserve original formatting (`Alpha Squad`)
+   - Modifiers: split on "and", lowercase (`smoke cover and radio silence` → `["smoke cover", "radio silence"]`)
+5. **Order Structure**: Convert to typed `Order` interface
+
+### Supported Unit Types
+
+- **Infantry Units**: `Alpha Squad`, `Bravo Squad`, `Charlie Squad`
+- **Short Names**: `Alpha`, `Bravo`, `Charlie` (automatically normalized)
+- **Faction Types**: `friendly`, `hostile`, `neutral`
+
+### Location Naming Conventions
+
+- **Geographic**: `Ridge Point`, `Valley Beta`, `Forest Edge`, `High Ground`
+- **Military Grid**: `Ridge-3`, `Zone-Alpha`, `Sector-7`
+- **Normalized Format**: All spaces converted to hyphens for internal processing
+
+### Time Constraints
+
+- **Military Time**: `1200Z`, `1500Z`, `0400Z` (Zulu time format)
+- **Relative Time**: `before dawn`, `at nightfall` (parsed as modifiers)
+
+### Tactical Modifiers
+
+- **Stealth**: `radio silence`, `under cover`
+- **Support**: `smoke cover`, `artillery support`
+- **Tactics**: `flanking maneuver`, `suppressing fire`
+- **Conditions**: `when morale low`, `when under heavy fire`
+
+### Parser Error Handling
+
+- Returns `null` for invalid commands
+- Case-insensitive matching for flexibility
+- Validates required fields (unit, destination for moves)
+- Graceful degradation for optional parameters
+
+### Integration with State Machine
+
+```typescript
+// Terminal UI → Parser → XState Machine
+onCommand={(command) =>
+  send({
+    type: 'SUBMIT_ORDER',
+    order: {
+      unit: command.unit,
+      action: command.action,
+      modifiers: command.modifiers,
+      destination: command.destination,
+      target: command.target,
+      time_constraint: command.time_constraint,
+    },
+  })
+}
 ```
 
 ---
